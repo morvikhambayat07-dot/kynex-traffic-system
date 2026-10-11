@@ -1,0 +1,5649 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KYNEX 2.0 â€” Smart Traffic Management & Autonomous Command Deck</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- App Stylesheet -->
+  <style>
+/* ==========================================================================
+   KYNEX 2.0 â€” Smart Traffic Management & Autonomous Command Deck Styles
+   Theme: Cyber-Intelligence Command Center (Dark Glassmorphism)
+   ========================================================================== */
+
+:root {
+  --bg-primary: #070b14;
+  --bg-secondary: #0d1527;
+  --bg-card: rgba(15, 23, 42, 0.82);
+  --bg-card-hover: rgba(26, 38, 66, 0.9);
+  --bg-glass: rgba(13, 21, 39, 0.75);
+  
+  --border-color: rgba(59, 130, 246, 0.25);
+  --border-glow: rgba(59, 130, 246, 0.6);
+  --border-accent: #3b82f6;
+
+  --accent-cyan: #06b6d4;
+  --accent-blue: #3b82f6;
+  --accent-indigo: #6366f1;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #ef4444;
+  --accent-purple: #a855f7;
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-glow: 0 0 10px rgba(59, 130, 246, 0.5);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Background Cyber Grid */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    linear-gradient(to right, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==========================================================================
+   1. LOGIN SCREEN
+   ========================================================================== */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #111d38 0%, #070b14 100%);
+  z-index: 1000;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.login-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  display: none !important;
+}
+
+.login-card {
+  position: relative;
+  width: 440px;
+  max-width: 90vw;
+  padding: 40px;
+  background: rgba(13, 21, 39, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.2);
+  text-align: center;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+}
+
+.login-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid var(--accent-blue);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.login-logo svg {
+  width: 32px;
+  height: 32px;
+  color: var(--accent-cyan);
+}
+
+.login-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+.login-credentials-hint {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px dashed rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #93c5fd;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.login-form .input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.login-form label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(7, 11, 20, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  transition: var(--transition);
+  outline: none;
+}
+
+.login-form input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+/* ==========================================================================
+   2. APP CONTAINER & TOP NAVIGATION DECK
+   ========================================================================== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  z-index: 1;
+}
+
+.top-bar {
+  height: 60px;
+  min-height: 60px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 100;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.3));
+  border: 1px solid var(--accent-cyan);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-cyan);
+}
+
+.brand-text h1 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  line-height: 1.1;
+  background: linear-gradient(90deg, #fff, #93c5fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-text span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* Nav Tabs */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(7, 11, 20, 0.6);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.tab-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.4));
+  border: 1px solid var(--accent-blue);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.tab-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Top Bar Right Stats & Operator info */
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-emerald);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-emerald);
+  box-shadow: 0 0 8px var(--accent-emerald);
+  animation: pulse-glow 1.8s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px var(--accent-emerald); }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+.clock-display {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #93c5fd;
+  background: rgba(13, 21, 39, 0.6);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.sound-toggle-btn {
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sound-toggle-btn:hover {
+  color: #fff;
+  border-color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.operator-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px 4px 6px;
+  border-radius: 20px;
+}
+
+.operator-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.operator-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.btn-logout {
+  padding: 6px 12px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: var(--accent-rose);
+}
+
+/* ==========================================================================
+   3. TAB CONTENT LAYOUTS
+   ========================================================================== */
+.tab-content {
+  display: none;
+  flex: 1;
+  overflow: hidden;
+  height: calc(100vh - 60px);
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+/* TAB 1: COMMAND DECK (3-COLUMN GRID) */
+#tab-command {
+  display: none;
+  grid-template-columns: 310px 1fr 320px;
+  gap: 12px;
+  padding: 12px;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+#tab-command.active {
+  display: grid;
+}
+
+/* Panel Styles */
+.command-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #93c5fd;
+  text-transform: uppercase;
+}
+
+.panel-title svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-cyan);
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+}
+
+.badge-blue { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+.badge-green { background: rgba(16, 185, 129, 0.2); color: #86efac; border: 1px solid rgba(16, 185, 129, 0.4); }
+.badge-amber { background: rgba(245, 158, 11, 0.2); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.4); }
+.badge-red { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+/* Control Groups */
+.control-card {
+  background: rgba(13, 21, 39, 0.6);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.control-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Signal Direction Rows */
+.signal-timing-row {
+  margin-bottom: 10px;
+}
+
+.signal-timing-row:last-child {
+  margin-bottom: 0;
+}
+
+.signal-timing-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.signal-timing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.signal-light-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #475569;
+  transition: var(--transition);
+}
+
+.signal-light-dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.signal-light-dot.amber { background: #eab308; box-shadow: 0 0 8px #eab308; }
+.signal-light-dot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+
+/* Custom Range Sliders */
+input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #1e293b;
+  border-radius: 3px;
+  outline: none;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent-cyan);
+  border: 2px solid #fff;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Mode Switcher Buttons */
+.mode-btn-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.mode-btn {
+  padding: 8px 4px;
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.mode-btn:hover {
+  color: #fff;
+  border-color: var(--accent-blue);
+}
+
+.mode-btn.active {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: var(--accent-blue);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+/* Test Violation Buttons Grid */
+.violation-buttons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-violation-test {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-violation-test:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  transform: translateY(-1px);
+}
+
+/* Rules Mini List */
+.rules-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.rule-pill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(13, 21, 39, 0.7);
+  border-left: 3px solid var(--accent-blue);
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.rule-pill-name { color: #cbd5e1; font-weight: 500; }
+.rule-pill-fine { color: var(--accent-rose); font-weight: 700; font-family: var(--font-mono); }
+
+/* ==========================================================================
+   4. CENTER PANEL â€” SIMULATION VIEWPORT & 3D SWITCHER
+   ========================================================================== */
+.center-viewport-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.viewport-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+}
+
+.viewport-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-mode-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(7, 11, 20, 0.7);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.view-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.view-mode-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* 3D Camera Controls Toolbar */
+.camera-presets-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camera-preset-btn {
+  padding: 5px 10px;
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.camera-preset-btn:hover {
+  color: #fff;
+  border-color: var(--accent-cyan);
+}
+
+.camera-preset-btn.active {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Simulation Canvas Container */
+.sim-stage-container {
+  position: relative;
+  flex: 1;
+  background: #060913;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+#canvas2D {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#canvas3D-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+/* HUD Overlay on Simulation */
+.sim-hud-overlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(7, 11, 20, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: #cbd5e1;
+}
+
+.hud-chip strong {
+  color: var(--accent-cyan);
+}
+
+.sim-hud-bottom {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* Speed Selector in HUD */
+.speed-pill-group {
+  display: flex;
+  background: rgba(7, 11, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.speed-pill {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: var(--transition);
+}
+
+.speed-pill.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+/* ==========================================================================
+   5. RIGHT PANEL â€” REVENUE & VIOLATIONS & EMERGENCY CORRIDOR
+   ========================================================================== */
+.right-telemetry-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* Revenue & Stats Cards */
+.stats-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.metric-card {
+  background: rgba(13, 21, 39, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-val {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #60a5fa;
+}
+
+.metric-val.emerald { color: var(--accent-emerald); }
+.metric-val.amber { color: var(--accent-amber); }
+.metric-val.rose { color: var(--accent-rose); }
+
+/* Emergency Corridor Box */
+.emergency-corridor-card {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+  transition: var(--transition);
+}
+
+.emergency-corridor-card.active {
+  border-color: var(--accent-rose);
+  background: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.35);
+}
+
+.emergency-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.emergency-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fca5a5;
+  text-transform: uppercase;
+}
+
+.emergency-status-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.emergency-status-text.active {
+  color: #f87171;
+  font-weight: 700;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.btn-emergency-trigger {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.btn-emergency-trigger:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+}
+
+/* Emergency Cascade Timeline */
+.cascade-steps {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(239, 68, 68, 0.3);
+}
+
+.cascade-step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94a3b8;
+  padding: 3px 0;
+}
+
+.cascade-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #475569;
+}
+
+.cascade-step-item.active {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.cascade-step-item.active .cascade-step-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+/* Real-Time Violations Feed */
+.live-violations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 220px;
+}
+
+.violations-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 260px;
+  padding-right: 4px;
+}
+
+.violation-row-card {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  background: rgba(13, 21, 39, 0.7);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.violation-row-card:hover {
+  background: rgba(26, 38, 66, 0.9);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateX(2px);
+}
+
+.violation-row-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.violation-row-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.violation-row-plate {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.violation-row-name {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.violation-row-fine {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--accent-rose);
+}
+
+/* ==========================================================================
+   6. TAB 2: GEOSPATIAL MAPS & HEATMAP MODULE
+   ========================================================================== */
+#tab-map {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 60px);
+  padding: 12px;
+  gap: 12px;
+}
+
+#tab-map.active {
+  display: flex;
+}
+
+.map-control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  gap: 16px;
+}
+
+.map-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.map-selector-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.select-custom {
+  background: rgba(7, 11, 20, 0.8);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.select-custom:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.map-layer-toggles {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-btn {
+  padding: 7px 12px;
+  background: rgba(13, 21, 39, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.layer-btn.active {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+.btn-add-map {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-add-map:hover {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  transform: translateY(-1px);
+}
+
+/* Map Canvas Container */
+.map-display-wrapper {
+  position: relative;
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+#leafletMap {
+  width: 100%;
+  height: 100%;
+  background: #0b0f19;
+}
+
+/* Custom Leaflet Map Pins */
+.custom-junction-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(59, 130, 246, 0.85);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+}
+
+.custom-violation-marker {
+  width: 24px;
+  height: 24px;
+  background: rgba(239, 68, 68, 0.85);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
+  animation: marker-pulse 1.5s infinite;
+}
+
+@keyframes marker-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); box-shadow: 0 0 20px rgba(239, 68, 68, 1); }
+  100% { transform: scale(1); }
+}
+
+/* Map Floating Info Badge */
+.map-floating-legend {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(7, 11, 20, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #cbd5e1;
+}
+
+/* ==========================================================================
+   7. TAB 3: E-CHALLAN LEDGER & DATABASE PANEL
+   ========================================================================== */
+#tab-database {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 60px);
+  padding: 12px;
+  gap: 12px;
+}
+
+#tab-database.active {
+  display: flex;
+}
+
+.db-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  gap: 16px;
+}
+
+.db-search-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 450px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 14px;
+  background: rgba(7, 11, 20, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 12px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.db-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--border-color);
+  color: #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-secondary:hover {
+  background: rgba(51, 65, 85, 0.9);
+  border-color: var(--accent-blue);
+}
+
+/* Database Table */
+.db-table-wrapper {
+  flex: 1;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.data-table th {
+  position: sticky;
+  top: 0;
+  background: rgba(13, 21, 39, 0.95);
+  border-bottom: 2px solid var(--border-color);
+  padding: 12px 14px;
+  font-weight: 700;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.12);
+  color: #cbd5e1;
+}
+
+.data-table tr:hover td {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.data-table .mono {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   8. TAB 4: TRAFFIC RULES & LAWS (IPC / MV ACT)
+   ========================================================================== */
+#tab-rules {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 60px);
+  padding: 12px;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+#tab-rules.active {
+  display: flex;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.rule-detail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.rule-detail-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.rule-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rule-detail-icon {
+  font-size: 24px;
+}
+
+.rule-detail-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rule-detail-section {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+}
+
+.rule-detail-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rule-detail-fine {
+  font-size: 18px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-rose);
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   9. MODALS & POPUPS
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.8);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modal-backdrop.open {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-dialog {
+  width: 500px;
+  max-width: 92vw;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #93c5fd;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.modal-close-btn:hover {
+  color: #fff;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(7, 11, 20, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--accent-cyan);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Violation Evidence Snapshot Canvas Mock */
+.evidence-preview-box {
+  background: #050811;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+#evidenceCanvas {
+  width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(13, 21, 39, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+</style>
+</head>
+<body>
+
+  <!-- ==========================================
+       1. AUTHENTICATION / LOGIN OVERLAY
+       ========================================== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 22V14M19 22V12M12 22V2M12 2v6M5 14h14" />
+        </svg>
+      </div>
+      <h1 class="login-title">KYNEX 2.0</h1>
+      <p class="login-subtitle">Intelligent Traffic Operations Command Deck</p>
+
+      <div class="login-credentials-hint">
+        <span><strong>Operator ID:</strong> OPERATOR001</span>
+        <span><strong>Password:</strong> admin123</span>
+      </div>
+
+      <form class="login-form" onsubmit="event.preventDefault(); window.app.login();">
+        <div class="input-group">
+          <label for="userId">Operator Identifier</label>
+          <input type="text" id="userId" value="OPERATOR001" autocomplete="username" required>
+        </div>
+        <div class="input-group">
+          <label for="userPass">Security Passcode</label>
+          <input type="password" id="userPass" value="admin123" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary" style="margin-top: 10px;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          AUTHENTICATE & ACCESS DECK
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       2. MAIN COMMAND APPLICATION
+       ========================================== -->
+  <div class="app-container">
+
+    <!-- TOP NAVIGATION DECK -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <div class="brand-badge">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>KYNEX 2.0</h1>
+            <span>Smart Traffic Core</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="command" onclick="window.app.switchTab('command')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Command Deck
+          </button>
+          <button class="tab-btn" data-tab="map" onclick="window.app.switchTab('map')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            Geospatial Maps
+          </button>
+          <button class="tab-btn" data-tab="database" onclick="window.app.switchTab('database')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            Challan Database
+          </button>
+          <button class="tab-btn" data-tab="rules" onclick="window.app.switchTab('rules')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Traffic Laws & Penalties
+          </button>
+        </nav>
+      </div>
+
+      <div class="top-bar-right">
+        <!-- Active Junction Tag -->
+        <div class="status-pill" style="color: #93c5fd; border-color: rgba(59, 130, 246, 0.4);">
+          <span style="color: #60a5fa;">ðŸ“</span>
+          <span id="activeJunctionTitle">Times Square Nexus</span>
+        </div>
+
+        <!-- Telemetry Status -->
+        <div class="status-pill">
+          <div class="pulse-dot"></div>
+          <span>AUTONOMOUS SYSTEM ONLINE</span>
+        </div>
+
+        <!-- Digital Clock -->
+        <div class="clock-display" id="liveClock">00:00:00 LOCAL</div>
+
+        <!-- Audio Mute/Unmute -->
+        <button class="sound-toggle-btn" id="btnSoundToggle" title="Toggle Sound FX" onclick="window.app.toggleSound()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- Operator Pill -->
+        <div class="operator-pill">
+          <div class="operator-avatar">ðŸ‘¨â€âœˆï¸</div>
+          <span class="operator-name" id="operatorDisplay">OPERATOR001</span>
+        </div>
+
+        <button class="btn-logout" onclick="window.app.logout()">LOGOUT</button>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         TAB 1: COMMAND DECK (3-COLUMN LAYOUT)
+         ========================================== -->
+    <main id="tab-command" class="tab-content active">
+
+      <!-- LEFT PANEL: CONTROLS & TIMING -->
+      <aside class="command-panel">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Signal Automation
+          </span>
+          <span class="badge badge-green">SYNCED</span>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="control-card">
+          <div class="control-card-title">
+            <span>Operating Mode</span>
+            <span style="font-size: 10px; color: var(--accent-cyan);">ACTIVE</span>
+          </div>
+          <div class="mode-btn-group">
+            <button class="mode-btn active" data-mode="auto">AUTO CYCLE</button>
+            <button class="mode-btn" data-mode="adaptive">ADAPTIVE AI</button>
+            <button class="mode-btn" data-mode="manual">MANUAL</button>
+          </div>
+        </div>
+
+        <!-- Phase Timing Sliders -->
+        <div class="control-card">
+          <div class="control-card-title">
+            <span>Green Phase Duration</span>
+            <span style="font-size: 10px; color: var(--text-secondary);">10s â€“ 90s</span>
+          </div>
+
+          <!-- North -->
+          <div class="signal-timing-row">
+            <div class="signal-timing-label">
+              <span class="signal-timing-indicator">
+                <span class="signal-light-dot" id="sigDot_north"></span>
+                <strong>NORTH (â†“)</strong>
+              </span>
+              <span class="mono"><span id="val_north">25</span>s</span>
+            </div>
+            <input type="range" id="slider_north" min="10" max="90" value="25">
+          </div>
+
+          <!-- South -->
+          <div class="signal-timing-row">
+            <div class="signal-timing-label">
+              <span class="signal-timing-indicator">
+                <span class="signal-light-dot" id="sigDot_south"></span>
+                <strong>SOUTH (â†‘)</strong>
+              </span>
+              <span class="mono"><span id="val_south">25</span>s</span>
+            </div>
+            <input type="range" id="slider_south" min="10" max="90" value="25">
+          </div>
+
+          <!-- East -->
+          <div class="signal-timing-row">
+            <div class="signal-timing-label">
+              <span class="signal-timing-indicator">
+                <span class="signal-light-dot" id="sigDot_east"></span>
+                <strong>EAST (â†)</strong>
+              </span>
+              <span class="mono"><span id="val_east">25</span>s</span>
+            </div>
+            <input type="range" id="slider_east" min="10" max="90" value="25">
+          </div>
+
+          <!-- West -->
+          <div class="signal-timing-row">
+            <div class="signal-timing-label">
+              <span class="signal-timing-indicator">
+                <span class="signal-light-dot" id="sigDot_west"></span>
+                <strong>WEST (â†’)</strong>
+              </span>
+              <span class="mono"><span id="val_west">25</span>s</span>
+            </div>
+            <input type="range" id="slider_west" min="10" max="90" value="25">
+          </div>
+        </div>
+
+        <!-- Test Violation Triggers -->
+        <div class="control-card">
+          <div class="control-card-title">
+            <span>Manual AI Violation Injector</span>
+            <span style="font-size: 10px; color: var(--accent-rose);">INSTANT</span>
+          </div>
+          <div class="violation-buttons-grid">
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('red_light')">ðŸ”´ Red Light</button>
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('speed')">âš¡ Speeding</button>
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('zebra')">ðŸš¶ Zebra Cross</button>
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('helmet')">ðŸï¸ No Helmet</button>
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('seatbelt')">ðŸš— Seatbelt</button>
+            <button class="btn-violation-test" onclick="window.app.triggerViolation('mobile')">ðŸ“± Cell Phone</button>
+          </div>
+        </div>
+
+        <!-- Rules Quick Summary -->
+        <div class="control-card">
+          <div class="control-card-title">
+            <span>Standard Penalties (MV Act)</span>
+            <span style="font-size: 10px; color: var(--accent-cyan);" onclick="window.app.switchTab('rules')" style="cursor: pointer;">VIEW ALL â†’</span>
+          </div>
+          <div class="rules-mini-list" id="rulesMiniList"></div>
+        </div>
+      </aside>
+
+      <!-- CENTER PANEL: DUAL VIEWPORT (2D & 3D INTERSECTION) -->
+      <section class="center-viewport-panel">
+        <!-- Viewport Toolbar -->
+        <div class="viewport-toolbar">
+          <div class="viewport-title-group">
+            <!-- 2D vs 3D Switcher -->
+            <div class="view-mode-toggle">
+              <button class="view-mode-btn active" data-mode="2d" onclick="window.app.switchViewMode('2d')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                2D TACTICAL
+              </button>
+              <button class="view-mode-btn" data-mode="3d" onclick="window.app.switchViewMode('3d')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                3D CYBER VIEW
+              </button>
+            </div>
+
+            <!-- 3D Camera Presets (Shown when in 3D mode) -->
+            <div class="camera-presets-group" id="cameraPresetsGroup" style="display: none;">
+              <span style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase;">Camera:</span>
+              <button class="camera-preset-btn active" data-preset="isometric">Isometric</button>
+              <button class="camera-preset-btn" data-preset="topdown">Top-Down</button>
+              <button class="camera-preset-btn" data-preset="street">Street Cam</button>
+              <button class="camera-preset-btn" data-preset="chase">Chase Angle</button>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
+            <span>60 FPS â€¢ Real-Time Physics</span>
+          </div>
+        </div>
+
+        <!-- Simulation Stage -->
+        <div class="sim-stage-container">
+          <!-- 2D Canvas -->
+          <canvas id="canvas2D"></canvas>
+
+          <!-- 3D WebGL Container -->
+          <div id="canvas3D-container"></div>
+
+          <!-- HUD Telemetry Overlay -->
+          <div class="sim-hud-overlay">
+            <div class="hud-chip">
+              <span>PHASE REMAINING:</span>
+              <strong id="hudPhaseSec">25s</strong>
+            </div>
+            <div class="hud-chip">
+              <span>NS QUEUE:</span>
+              <strong id="hudQueueNS">0</strong>
+              <span style="color: #64748b;">|</span>
+              <span>EW QUEUE:</span>
+              <strong id="hudQueueEW">0</strong>
+            </div>
+          </div>
+
+          <!-- Speed Controls Bottom-Right -->
+          <div class="sim-hud-bottom">
+            <div class="speed-pill-group">
+              <button class="speed-pill" data-speed="1">1x</button>
+              <button class="speed-pill active" data-speed="2">2x</button>
+              <button class="speed-pill" data-speed="3">3x</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT PANEL: REVENUE, EMERGENCY CORRIDOR & VIOLATION FEED -->
+      <aside class="command-panel right-telemetry-panel">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Fine Collection & Telemetry
+          </span>
+          <span class="badge badge-blue">LEDGER</span>
+        </div>
+
+        <!-- Revenue Stats -->
+        <div class="stats-grid-2">
+          <div class="metric-card">
+            <span class="metric-label">COLLECTED TODAY</span>
+            <span class="metric-val emerald" id="statFineToday">â‚¹0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">THIS MONTH</span>
+            <span class="metric-val" id="statFineMonth">â‚¹0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">PENDING CHALLANS</span>
+            <span class="metric-val amber" id="statPendingCount">0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">SETTLED FINES</span>
+            <span class="metric-val emerald" id="statPaidCount">0</span>
+          </div>
+        </div>
+
+        <!-- Emergency Green Corridor Box -->
+        <div class="emergency-corridor-card">
+          <div class="emergency-header">
+            <span class="emergency-title">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              Emergency Priority Corridor
+            </span>
+            <span class="badge badge-red">CRITICAL</span>
+          </div>
+          <div class="emergency-status-text" id="emergencyStatusMsg">System Standby â€¢ No active emergency convoy</div>
+          <button class="btn-emergency-trigger" id="btnEmergency" onclick="window.app.triggerEmergencyAmbulance()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 14 14"></polyline>
+            </svg>
+            DISPATCH AMBULANCE CONVOY
+          </button>
+          <button class="btn-secondary" style="width: 100%; margin-top: 8px; font-size: 11px; justify-content: center;" onclick="window.app.openModal('emergencySensorsModal')">
+            ðŸ“¡ INDIAN ITS & AMBULANCE SENSORS DEEP DIVE
+          </button>
+
+          <!-- Emergency Signal Cascader Steps -->
+          <div class="cascade-steps" id="cascadeStepsBox">
+            <div class="cascade-step-item">
+              <span class="cascade-step-dot"></span>
+              <span>1. Halting Cross Traffic (Amber â†’ Red)</span>
+            </div>
+            <div class="cascade-step-item">
+              <span class="cascade-step-dot"></span>
+              <span>2. Locking Green Wave on North Axis</span>
+            </div>
+            <div class="cascade-step-item">
+              <span class="cascade-step-dot"></span>
+              <span>3. Escorting Emergency Convoy</span>
+            </div>
+            <div class="cascade-step-item">
+              <span class="cascade-step-dot"></span>
+              <span>4. Safely Restoring Standard Cycle</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Violations Feed -->
+        <div class="live-violations-container">
+          <div class="panel-header" style="padding-bottom: 6px;">
+            <span class="panel-title" style="font-size: 11px;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              Live ANPR Violation Stream
+            </span>
+            <span style="font-size: 10px; color: var(--text-muted);">Click to inspect</span>
+          </div>
+
+          <div class="violations-scroll-list" id="liveViolationsList">
+            <div class="empty-feed" style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 20px;">
+              Monitoring active camera feeds for violations...
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ==========================================
+         TAB 2: GEOSPATIAL MAPS & MULTI-MAP MANAGER
+         ========================================== -->
+    <section id="tab-map" class="tab-content">
+      <div class="map-control-bar">
+        <div class="map-selector-group">
+          <label for="mapSelect">Active Intersection:</label>
+          <select id="mapSelect" class="select-custom"></select>
+        </div>
+
+        <!-- Layer Pickers: Google Road, Google Satellite, Google Hybrid, Cyber Dark -->
+        <div class="map-layer-toggles">
+          <button class="layer-btn active" data-layer="carto_dark" onclick="window.KynexMap.setLayer('carto_dark')">Cyber Dark</button>
+          <button class="layer-btn" data-layer="google_road" onclick="window.KynexMap.setLayer('google_road')">Google Road</button>
+          <button class="layer-btn" data-layer="google_satellite" onclick="window.KynexMap.setLayer('google_satellite')">Google Satellite</button>
+          <button class="layer-btn" data-layer="google_hybrid" onclick="window.KynexMap.setLayer('google_hybrid')">Google Hybrid</button>
+        </div>
+
+        <!-- Add Another Map Button -->
+        <button class="btn-add-map" onclick="window.app.openModal('addMapModal')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          ADD ANOTHER MAP / JUNCTION
+        </button>
+      </div>
+
+      <div class="map-display-wrapper">
+        <div id="leafletMap"></div>
+
+        <!-- Floating Legend -->
+        <div class="map-floating-legend">
+          <div class="legend-row">
+            <span style="color: #38bdf8;">ðŸš¦</span> Active Signal Hub
+          </div>
+          <div class="legend-row">
+            <span style="color: #ef4444;">ðŸ”´</span> Live Violation Hotspot
+          </div>
+          <div class="legend-row">
+            <span style="color: #ef4444; font-weight: bold;">- - -</span> Emergency Green Corridor
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: E-CHALLAN DATABASE & LEDGER
+         ========================================== -->
+    <section id="tab-database" class="tab-content">
+      <div class="db-toolbar">
+        <div class="db-search-group">
+          <input type="text" id="ledgerSearchInput" class="search-input" placeholder="Search by Plate Number, Challan ID, or Rule...">
+          <select id="ledgerStatusFilter" class="select-custom" style="width: 140px;">
+            <option value="ALL">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+
+        <div class="db-actions-group">
+          <button class="btn-secondary" onclick="window.app.exportCSV()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export CSV
+          </button>
+          <button class="btn-secondary" onclick="window.app.exportJSON()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Backup JSON
+          </button>
+          <button class="btn-secondary" onclick="window.app.openModal('backupModal')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Restore Backup
+          </button>
+        </div>
+      </div>
+
+      <div class="db-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Challan ID</th>
+              <th>License Plate</th>
+              <th>Violation Rule</th>
+              <th>Fine (INR)</th>
+              <th>Detected Speed</th>
+              <th>Timestamp</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerTableBody">
+            <!-- Dynamically injected -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 4: TRAFFIC RULES & LAWS (IPC / MV ACT)
+         ========================================== -->
+    <section id="tab-rules" class="tab-content">
+      <div class="panel-header" style="margin-bottom: 12px;">
+        <span class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          Motor Vehicles Act & Penal Code Reference Database
+        </span>
+        <span class="badge badge-blue">STATUTORY STANDARDS</span>
+      </div>
+
+      <div class="rules-grid" id="rulesCardsGrid"></div>
+    </section>
+
+  </div>
+
+  <!-- ==========================================
+       MODAL: ADD ANOTHER MAP / JUNCTION
+       ========================================== -->
+  <div id="addMapModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span class="modal-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+          </svg>
+          Add Another Map / Intersection
+        </span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('addMapModal')">&times;</button>
+      </div>
+
+      <form id="addMapForm">
+        <div class="form-group">
+          <label for="newMapName">Intersection Name</label>
+          <input type="text" id="newMapName" placeholder="e.g. Champs-Ã‰lysÃ©es Central Hub" required>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="newMapCity">City / Region</label>
+            <input type="text" id="newMapCity" placeholder="e.g. Paris" required>
+          </div>
+          <div class="form-group">
+            <label for="newMapCountry">Country</label>
+            <input type="text" id="newMapCountry" placeholder="e.g. France">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="newMapLat">Latitude</label>
+            <input type="number" step="any" id="newMapLat" placeholder="e.g. 48.8698" required>
+          </div>
+          <div class="form-group">
+            <label for="newMapLng">Longitude</label>
+            <input type="number" step="any" id="newMapLng" placeholder="e.g. 2.3075" required>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="newMapSpeed">Speed Limit</label>
+            <input type="text" id="newMapSpeed" placeholder="50 km/h" value="50 km/h">
+          </div>
+          <div class="form-group">
+            <label for="newMapApproaches">Signal Approaches</label>
+            <select id="newMapApproaches" class="select-custom">
+              <option value="4" selected>4-Way Standard Intersection</option>
+              <option value="3">3-Way T-Junction</option>
+              <option value="5">5-Way Scramble Nexus</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newMapNotes">Operational Notes</label>
+          <textarea id="newMapNotes" rows="2" placeholder="CCTV camera calibration and local traffic notes..."></textarea>
+        </div>
+
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">
+          ðŸ’¡ <em>Tip: You can also click directly anywhere on the map to automatically populate latitude and longitude!</em>
+        </p>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="window.app.closeModal('addMapModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Save & Activate Map</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: VIOLATION EVIDENCE SNAPSHOT
+       ========================================== -->
+  <div id="evidenceModal" class="modal-backdrop">
+    <div class="modal-dialog" style="width: 540px;">
+      <div class="modal-header">
+        <span class="modal-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          ANPR AI Camera Evidence Verification
+        </span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('evidenceModal')">&times;</button>
+      </div>
+
+      <!-- Evidence Canvas -->
+      <div class="evidence-preview-box">
+        <canvas id="evidenceCanvas"></canvas>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 14px;">
+        <div><strong>Challan ID:</strong> <span id="modalChallanNo" class="mono" style="color: #93c5fd;"></span></div>
+        <div><strong>Vehicle Plate:</strong> <span id="modalPlate" class="mono" style="font-weight: 700; color: #fff;"></span></div>
+        <div><strong>Violation:</strong> <span id="modalRule"></span></div>
+        <div><strong>Fine Amount:</strong> <span id="modalFine" class="mono" style="color: var(--accent-rose); font-weight: 700;"></span></div>
+        <div><strong>Recorded Speed:</strong> <span id="modalSpeed" class="mono"></span></div>
+        <div><strong>Status:</strong> <span id="modalStatus" class="badge"></span></div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="window.app.closeModal('evidenceModal')">Close</button>
+        <button type="button" class="btn-primary" id="modalPayBtn" style="width: auto;">MARK AS PAID</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: DATABASE RESTORE BACKUP
+       ========================================== -->
+  <div id="backupModal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <span class="modal-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Restore Database from Backup
+        </span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('backupModal')">&times;</button>
+      </div>
+
+      <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">
+        Select a previously exported JSON backup file. All violations, custom maps, and audit logs will be merged into the persistent database.
+      </p>
+
+      <div class="form-group">
+        <label for="jsonBackupInput">Select Backup File (.json)</label>
+        <input type="file" id="jsonBackupInput" accept=".json" onchange="window.app.handleImportFile(this.files[0])">
+      </div>
+
+  <!-- ==========================================
+       MODAL: INDIAN ITS & AMBULANCE SENSORS DEEP DIVE
+       ========================================== -->
+  <div id="emergencySensorsModal" class="modal-backdrop">
+    <div class="modal-dialog" style="width: 720px; max-height: 88vh; overflow-y: auto;">
+      <div class="modal-header">
+        <span class="modal-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          Indian ITS: Ambulance Detection & Corridor Clearing Architecture
+        </span>
+        <button class="modal-close-btn" onclick="window.app.closeModal('emergencySensorsModal')">&times;</button>
+      </div>
+
+      <div style="font-size: 12px; color: #cbd5e1; line-height: 1.6; display: flex; flex-direction: column; gap: 14px;">
+        
+        <!-- SECTION 1 -->
+        <div style="background: rgba(13, 21, 39, 0.7); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 14px;">
+          <h4 style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            ðŸ“¡ 1. HOW IS THE AMBULANCE DETECTED IN INDIA?
+          </h4>
+          <p style="margin-bottom: 8px;">In real-world Indian Smart Cities (e.g. Bengaluru, Surat, Ahmedabad, Chennai), a single sensor is insufficient due to extreme noise and chaos. KYNEX integrates a <strong>Multi-Sensor Fusion Pipeline</strong>:</p>
+          <ul style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+            <li><strong>AIS-140 Certified GPS Telematics (MoRTH Standard):</strong> All emergency ambulances (108 / 102 network) have mandatory GPS tracking units. When the ambulance breaches a <strong>500m geofence</strong> of a junction, an encrypted MQTT signal notifies the signal controller.</li>
+            <li><strong>Directional Acoustic Siren Array (DSP / FFT):</strong> Microphone nodes mounted on the junction mast analyze incoming sound waves. Digital Signal Processors (DSP) detect the unique frequency sweep of Indian emergency sirens (Yelp & Wail: 650 Hz â€“ 960 Hz) and use Doppler shift & Time Difference of Arrival (TDoA) to calculate the approach corridor.</li>
+            <li><strong>Edge Computer Vision (YOLOv8 / Jetson Orin):</strong> HD CCTV cameras run AI models fine-tuned on Indian emergency fleets to identify the red cross symbol, white chassis, and active blue/red flashing strobe lights with 99.2% accuracy.</li>
+            <li><strong>FASTag / Active RFID Transponders:</strong> Roadside DSRC readers detect encrypted emergency responder RFID tags affixed to the windshield.</li>
+          </ul>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div style="background: rgba(13, 21, 39, 0.7); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 14px;">
+          <h4 style="color: #34d399; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            ðŸš— 2. HOW ARE OTHER VEHICLES DETECTED IN INDIA?
+          </h4>
+          <p style="margin-bottom: 8px;">Indian traffic is <em>heterogeneous and lane-free</em> (bicycles, auto-rickshaws, bikes, cars, e-rickshaws, buses, and heavy commercial vehicles). Detection utilizes:</p>
+          <ul style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+            <li><strong>Multi-Class Deep Neural Networks:</strong> Edge AI classifies vehicles into distinct Indian traffic categories: Two-Wheelers (45%), Auto-Rickshaws (18%), Sedans/SUVs (24%), and Buses/Trucks (13%).</li>
+            <li><strong>24 GHz / 77 GHz FMCW Radar:</strong> Unlike optical cameras, radar penetrates heavy monsoon rain, thick winter fog/smog (in North India), and night conditions, tracking exact queue length and vehicle deceleration profiles.</li>
+            <li><strong>Virtual Stop-Line & Box Detectors:</strong> Real-time tracking of queue depth to calculate dynamic clearance clearance time for cross traffic before pre-emption.</li>
+          </ul>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div style="background: rgba(13, 21, 39, 0.7); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 8px; padding: 14px;">
+          <h4 style="color: #f87171; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            ðŸš¨ 3. DO WE NEED A NEW SIGNAL COLOR? HOW DO WE MAKE WAY?
+          </h4>
+          <p style="margin-bottom: 8px;"><strong>NO, a 4th signal color (such as Blue or White) is NOT recommended or legally permitted:</strong> Under the <em>UN Vienna Convention on Road Signals</em> and the <em>Indian Road Congress (IRC:SP:41 & IRC:67)</em>, traffic signals are strictly Red, Amber, and Green. Introducing a new color leads to driver panic, hesitation, and rear-end collisions.</p>
+          <p style="margin-bottom: 8px;"><strong>The Real-World Engineering Solution Implemented in KYNEX 2.0:</strong></p>
+          <ol style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+            <li><strong>Dynamic Green Wave (Corridor Pre-emption):</strong> The ambulance's approach turns <strong>SOLID GREEN</strong>, while all cross approaches immediately get an Amber (3s) clearance buffer and lock into <strong>ALL RED</strong>.</li>
+            <li><strong>Overhead Dynamic Variable Message Signs (VMS):</strong> Bright LED digital signboards over the junction flash: <span style="color: #ef4444; font-family: monospace; font-weight: bold;">"ðŸš¨ AMBULANCE IN TRANSIT â€” CLEAR CENTER CORRIDOR"</span>.</li>
+            <li><strong>Public Address (PA) Horn Voice System:</strong> Directional loudspeaker horns blast audible voice commands in English & local regional languages: <em>"Emergency vehicle approaching on North Axis. Yield to the curbs."</em></li>
+            <li><strong>Rescue Lane Protocol (Rettungsgasse):</strong> Regular vehicles in front of the ambulance smoothly steer towards the left and right shoulders (as simulated in KYNEX 2D & 3D), opening an unobstructed center lane for the emergency vehicle!</li>
+            <li><strong>High-Intensity Auxiliary Strobe Bar:</strong> A dual blue/white strobe LED bar flashes atop the gantry mast to alert drivers 400 meters away.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-primary" style="width: auto;" onclick="window.app.closeModal('emergencySensorsModal')">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js CDN & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Leaflet Maps CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Application Modules -->
+  <script>
+/**
+ * KYNEX 2.0 â€” Audio FX Synthesizer
+ * Uses native Web Audio API for high-tech procedural sound effects
+ * Zero external audio assets required. Handles browser autoplay policies.
+ */
+
+class AudioSynthesizer {
+  constructor() {
+    this.ctx = null;
+    this.isMuted = false;
+    this.sirenOsc1 = null;
+    this.sirenOsc2 = null;
+    this.sirenGain = null;
+    this.sirenInterval = null;
+    
+    // Load mute state from localStorage
+    try {
+      const savedMute = localStorage.getItem('kynex_muted');
+      if (savedMute !== null) {
+        this.isMuted = savedMute === 'true';
+      }
+    } catch (e) {
+      console.warn('Could not read audio preference', e);
+    }
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    try {
+      localStorage.setItem('kynex_muted', this.isMuted);
+    } catch (e) {}
+    if (this.isMuted && this.sirenInterval) {
+      this.stopSiren();
+    }
+    return this.isMuted;
+  }
+
+  // Soft futuristic UI click blip
+  playClick() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.04);
+
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.05);
+    } catch (e) {}
+  }
+
+  // Violation Alert Chime (Double Radar Ping)
+  playAlert() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(880, now); // A5
+      osc.frequency.setValueAtTime(1174.66, now + 0.08); // D6
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } catch (e) {}
+  }
+
+  // Success Harmonic Chime (e.g. Challan Paid, Map Saved)
+  playSuccess() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const startTime = this.ctx.currentTime + idx * 0.06;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gain.gain.setValueAtTime(0.08, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + 0.2);
+      });
+    } catch (e) {}
+  }
+
+  // Emergency Siren (Continuous Oscillating Wail)
+  startSiren() {
+    if (this.isMuted || this.sirenInterval) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      this.sirenOsc1 = this.ctx.createOscillator();
+      this.sirenGain = this.ctx.createGain();
+
+      this.sirenOsc1.type = 'sawtooth';
+      this.sirenGain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+
+      // Low-pass filter to soften the harsh sawtooth edge
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(900, this.ctx.currentTime);
+
+      this.sirenOsc1.connect(filter);
+      filter.connect(this.sirenGain);
+      this.sirenGain.connect(this.ctx.destination);
+
+      this.sirenOsc1.start();
+
+      let toggle = false;
+      const sweep = () => {
+        if (!this.ctx || !this.sirenOsc1) return;
+        const targetFreq = toggle ? 960 : 650;
+        this.sirenOsc1.frequency.exponentialRampToValueAtTime(targetFreq, this.ctx.currentTime + 0.45);
+        toggle = !toggle;
+      };
+
+      sweep();
+      this.sirenInterval = setInterval(sweep, 450);
+    } catch (e) {
+      console.warn('Failed to start siren', e);
+    }
+  }
+
+  // Automated Public Address (PA) Horn Voice System
+  speakPAAnnouncement(text = "Attention drivers: Emergency vehicle approaching. Please yield and clear the center corridor.") {
+    if (this.isMuted) return;
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop any pending speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.0;
+      utterance.volume = 0.9;
+      // Prefer English voice
+      const voices = window.speechSynthesis.getVoices();
+      const engVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+      if (engVoice) utterance.voice = engVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  stopSiren() {
+    if (this.sirenInterval) {
+      clearInterval(this.sirenInterval);
+      this.sirenInterval = null;
+    }
+    if (this.sirenOsc1) {
+      try {
+        this.sirenOsc1.stop();
+        this.sirenOsc1.disconnect();
+      } catch (e) {}
+      this.sirenOsc1 = null;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  }
+}
+
+// Global audio singleton
+window.KynexAudio = new AudioSynthesizer();
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” Traffic Rules & Violation Synthesizer
+ * Database of traffic laws, fines, license plate generation, and AI snapshot generator
+ */
+
+const TRAFFIC_RULES = {
+  red_light: {
+    key: 'red_light',
+    name: 'Red Light Signal Jump',
+    section: 'Sec. 184 (Dangerous Driving)',
+    icon: 'ðŸ”´',
+    fine: 1000,
+    severity: 'High',
+    desc: 'Crossing the stop line while the traffic signal is red. Poses catastrophic collision hazard.',
+    vehicleTypes: ['car', 'bike', 'suv', 'truck']
+  },
+  speed: {
+    key: 'speed',
+    name: 'Over-Speeding (> 60 km/h in Urban Zone)',
+    section: 'Sec. 183 MV Act',
+    icon: 'âš¡',
+    fine: 2000,
+    severity: 'High',
+    desc: 'Exceeding calibrated radar speed limits in congested municipal or junction zones.',
+    vehicleTypes: ['car', 'bike', 'suv']
+  },
+  zebra: {
+    key: 'zebra',
+    name: 'Pedestrian Zebra Obstruction',
+    section: 'Sec. 177 / Rules of the Road',
+    icon: 'ðŸš¶',
+    fine: 1000,
+    severity: 'Medium',
+    desc: 'Vehicle stopping inside or blocking designated pedestrian crosswalk during red signal.',
+    vehicleTypes: ['car', 'bike', 'suv', 'truck']
+  },
+  helmet: {
+    key: 'helmet',
+    name: 'Riding Without BIS Safety Helmet',
+    section: 'Sec. 194D MV Act',
+    icon: 'ðŸï¸',
+    fine: 1500,
+    severity: 'Medium',
+    desc: 'Two-wheeler operator or pillion rider detected without safety approved headgear.',
+    vehicleTypes: ['bike']
+  },
+  seatbelt: {
+    key: 'seatbelt',
+    name: 'No Safety Seatbelt Fastened',
+    section: 'Sec. 194B MV Act',
+    icon: 'ðŸš—',
+    fine: 1000,
+    severity: 'Medium',
+    desc: 'Driver or front-seat passenger seated in moving motor vehicle without seatbelt engaged.',
+    vehicleTypes: ['car', 'suv', 'truck']
+  },
+  mobile: {
+    key: 'mobile',
+    name: 'Handheld Mobile Device Usage',
+    section: 'Sec. 184(c) MV Act',
+    icon: 'ðŸ“±',
+    fine: 5000,
+    severity: 'High',
+    desc: 'Operating handheld cellular communication device while navigating in motion.',
+    vehicleTypes: ['car', 'bike', 'suv', 'truck']
+  },
+  lane: {
+    key: 'lane',
+    name: 'Improper Lane Changing / Straddling',
+    section: 'Sec. 177 MV Act',
+    icon: 'â†”ï¸',
+    fine: 1500,
+    severity: 'Low',
+    desc: 'Violating solid dividing lane markers or abruptly cutting lanes at intersection.',
+    vehicleTypes: ['car', 'suv', 'truck']
+  },
+  emergency_block: {
+    key: 'emergency_block',
+    name: 'Failure to Yield to Emergency Vehicle',
+    section: 'Sec. 194E MV Act',
+    icon: 'ðŸš‘',
+    fine: 10000,
+    severity: 'Critical',
+    desc: 'Failing to draw to the side of the road to allow free passage of emergency response convoy.',
+    vehicleTypes: ['car', 'suv', 'truck', 'bike']
+  },
+  pollution: {
+    key: 'pollution',
+    name: 'Expired Emission Certificate (PUC)',
+    section: 'Sec. 190(2) MV Act',
+    icon: 'ðŸ’¨',
+    fine: 10000,
+    severity: 'High',
+    desc: 'Vehicle operating with expired emission compliance standard or excessive exhaust plume.',
+    vehicleTypes: ['car', 'truck', 'suv']
+  },
+  parking: {
+    key: 'parking',
+    name: 'No-Parking / Yellow Box Obstruction',
+    section: 'Sec. 122/177 MV Act',
+    icon: 'ðŸ…¿ï¸',
+    fine: 1000,
+    severity: 'Low',
+    desc: 'Stopping in intersection yellow box grid or unauthorized municipal curbside.',
+    vehicleTypes: ['car', 'suv', 'truck']
+  }
+};
+
+class RulesManager {
+  // Generate a realistic license plate number
+  static generateLicensePlate() {
+    const states = ['DL', 'MH', 'KA', 'TS', 'TN', 'GJ', 'HR', 'UP', 'NY', 'CA'];
+    const state = states[Math.floor(Math.random() * states.length)];
+    const rto = String(Math.floor(Math.random() * 20 + 1)).padStart(2, '0');
+    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const c1 = letters[Math.floor(Math.random() * letters.length)];
+    const c2 = letters[Math.floor(Math.random() * letters.length)];
+    const num = String(Math.floor(Math.random() * 9000 + 1000));
+    return `${state}-${rto}-${c1}${c2}-${num}`;
+  }
+
+  // Generate unique E-Challan ID
+  static generateChallanId() {
+    const year = new Date().getFullYear();
+    const randomHex = Math.floor(Math.random() * 0xffffff).toString(16).toUpperCase().padStart(6, '0');
+    return `CH-${year}-${randomHex}`;
+  }
+
+  // Create a structured violation record
+  static createViolation(ruleKey, customPlate = null, junctionInfo = null) {
+    const rule = TRAFFIC_RULES[ruleKey] || TRAFFIC_RULES.red_light;
+    const plate = customPlate || this.generateLicensePlate();
+    const speed = rule.key === 'speed' 
+      ? Math.floor(Math.random() * 35 + 72) // 72 to 107 km/h
+      : Math.floor(Math.random() * 20 + 35); // normal 35 to 55 km/h
+
+    return {
+      challanNo: this.generateChallanId(),
+      plate: plate,
+      ruleKey: rule.key,
+      ruleName: rule.name,
+      section: rule.section,
+      fine: rule.fine,
+      severity: rule.severity,
+      icon: rule.icon,
+      speed: `${speed} km/h`,
+      speedLimit: '50 km/h',
+      timestamp: new Date().toISOString(),
+      displayTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      date: new Date().toLocaleDateString(),
+      junctionId: junctionInfo ? junctionInfo.id : 'junc_default',
+      junctionName: junctionInfo ? junctionInfo.name : 'Central 4-Way Axis',
+      status: 'Pending', // 'Pending' or 'Paid'
+      evidenceImg: null // Generated dynamically when viewing snapshot
+    };
+  }
+
+  // Draw simulated CCTV snapshot on a canvas for evidence verification
+  static drawEvidenceSnapshot(canvas, violation) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width = 460;
+    const h = canvas.height = 240;
+
+    // Dark road background with night vision / surveillance tint
+    ctx.fillStyle = '#0a101d';
+    ctx.fillRect(0, 0, w, h);
+
+    // Grid scanlines
+    ctx.strokeStyle = 'rgba(6, 182, 212, 0.08)';
+    ctx.lineWidth = 1;
+    for (let y = 0; y < h; y += 4) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+
+    // Asphalt perspective
+    ctx.fillStyle = '#161e2e';
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(w * 0.3, h * 0.4);
+    ctx.lineTo(w * 0.7, h * 0.4);
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // Road markings
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([12, 12]);
+    ctx.beginPath();
+    ctx.moveTo(w * 0.5, h);
+    ctx.lineTo(w * 0.5, h * 0.4);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Vehicle silhouette
+    const carX = w * 0.42;
+    const carY = h * 0.48;
+    const carW = 90;
+    const carH = 50;
+
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(carX, carY, carW, carH);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(carX + 15, carY - 20, carW - 30, 20); // Cabin
+
+    // Tail lights
+    ctx.fillStyle = '#ef4444';
+    ctx.shadowColor = '#ef4444';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(carX + 5, carY + 30, 14, 8);
+    ctx.fillRect(carX + carW - 19, carY + 30, 14, 8);
+    ctx.shadowBlur = 0;
+
+    // ANPR AI Bounding Box around License Plate
+    const plateX = carX + 22;
+    const plateY = carY + 28;
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(plateX - 6, plateY - 4, 58, 20);
+
+    // Corner brackets
+    const bSize = 6;
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = 2;
+    // Top-left
+    ctx.beginPath();
+    ctx.moveTo(carX - 8, carY - 26);
+    ctx.lineTo(carX - 8 + bSize, carY - 26);
+    ctx.moveTo(carX - 8, carY - 26);
+    ctx.lineTo(carX - 8, carY - 26 + bSize);
+    ctx.stroke();
+
+    // ANPR Plate text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText(violation.plate, plateX - 2, plateY + 10);
+
+    // AI Detection Tag
+    ctx.fillStyle = 'rgba(6, 182, 212, 0.9)';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillText(`ANPR: 99.4% [${violation.plate}]`, plateX - 6, plateY - 8);
+
+    // CCTV Telemetry OSD Header
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, w, 28);
+    ctx.fillStyle = '#06b6d4';
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`CAM-04 [HD-4K] â€¢ ${violation.junctionName}`, 12, 18);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.textAlign = 'right';
+    ctx.fillText(`SPEED: ${violation.speed} | REC â—`, w - 12, 18);
+    ctx.textAlign = 'left';
+
+    // Timestamp & Violation Label at bottom
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, h - 30, w, 30);
+    ctx.fillStyle = '#f1f5f9';
+    ctx.font = '10px monospace';
+    ctx.fillText(`${violation.date} ${violation.displayTime} UTC | VIOLATION: ${violation.ruleName}`, 12, h - 11);
+
+    return canvas.toDataURL('image/png');
+  }
+}
+
+window.TRAFFIC_RULES = TRAFFIC_RULES;
+window.RulesManager = RulesManager;
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” Persistent Storage Engine (IndexedDB & LocalStorage Fallback)
+ * Manages Violations (Challans), Custom Added Maps, Audit Logs, and Analytics.
+ * Provides complete JSON/CSV export and JSON restore capabilities.
+ */
+
+const DB_NAME = 'KynexTrafficDB';
+const DB_VERSION = 2;
+
+class KynexDatabase {
+  constructor() {
+    this.db = null;
+    this.isReady = false;
+    this.defaultMaps = [
+      {
+        id: 'junc_times_sq',
+        name: 'Times Square Nexus (Broadway & 7th)',
+        city: 'New York',
+        country: 'USA',
+        lat: 40.758896,
+        lng: -73.985130,
+        zoom: 17,
+        signalsCount: 4,
+        camerasCount: 8,
+        speedLimit: '45 km/h',
+        notes: 'High pedestrian density zone with automated crosswalk prioritization.',
+        isDefault: true
+      },
+      {
+        id: 'junc_shibuya',
+        name: 'Shibuya Scramble Crossing',
+        city: 'Tokyo',
+        country: 'Japan',
+        lat: 35.659482,
+        lng: 139.700553,
+        zoom: 18,
+        signalsCount: 4,
+        camerasCount: 12,
+        speedLimit: '40 km/h',
+        notes: 'World-famous scramble intersection with multi-directional pedestrian phases.',
+        isDefault: true
+      },
+      {
+        id: 'junc_connaught',
+        name: 'Connaught Place Outer Radial',
+        city: 'New Delhi',
+        country: 'India',
+        lat: 28.6315,
+        lng: 77.2167,
+        zoom: 17,
+        signalsCount: 4,
+        camerasCount: 10,
+        speedLimit: '50 km/h',
+        notes: 'High throughput concentric rotary intersection with high two-wheeler density.',
+        isDefault: true
+      },
+      {
+        id: 'junc_silicon_valley',
+        name: 'Santana Row & Stevens Creek Corridor',
+        city: 'San Jose, CA',
+        country: 'USA',
+        lat: 37.322998,
+        lng: -121.948270,
+        zoom: 17,
+        signalsCount: 4,
+        camerasCount: 6,
+        speedLimit: '55 km/h',
+        notes: 'Connected autonomous vehicle test corridor with V2X roadside sensors.',
+        isDefault: true
+      }
+    ];
+  }
+
+  // Initialize IndexedDB
+  async init() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB) {
+        console.warn('IndexedDB not supported, falling back to LocalStorage');
+        this.isReady = true;
+        this.ensureDefaultMapsInLS();
+        resolve(this);
+        return;
+      }
+
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        
+        // Violations store
+        if (!db.objectStoreNames.contains('violations')) {
+          const store = db.createObjectStore('violations', { keyPath: 'challanNo' });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('plate', 'plate', { unique: false });
+        }
+
+        // Maps store
+        if (!db.objectStoreNames.contains('maps')) {
+          db.createObjectStore('maps', { keyPath: 'id' });
+        }
+
+        // Audit Logs store
+        if (!db.objectStoreNames.contains('audit_logs')) {
+          db.createObjectStore('audit_logs', { keyPath: 'id', autoIncrement: true });
+        }
+      };
+
+      request.onsuccess = async (e) => {
+        this.db = e.target.result;
+        this.isReady = true;
+        await this.ensureDefaultMaps();
+        resolve(this);
+      };
+
+      request.onerror = (e) => {
+        console.error('IndexedDB open error:', e);
+        this.isReady = true;
+        this.ensureDefaultMapsInLS();
+        resolve(this);
+      };
+    });
+  }
+
+  // Ensure default maps exist
+  async ensureDefaultMaps() {
+    if (!this.db) {
+      this.ensureDefaultMapsInLS();
+      return;
+    }
+    const maps = await this.getMaps();
+    if (maps.length === 0) {
+      for (const m of this.defaultMaps) {
+        await this.saveMap(m);
+      }
+    }
+  }
+
+  ensureDefaultMapsInLS() {
+    const raw = localStorage.getItem('kynex_maps');
+    if (!raw) {
+      localStorage.setItem('kynex_maps', JSON.stringify(this.defaultMaps));
+    }
+  }
+
+  // --- VIOLATIONS (CHALLANS) ---
+
+  async saveViolation(violation) {
+    if (!this.db) {
+      const all = this.getViolationsFromLS();
+      all.unshift(violation);
+      localStorage.setItem('kynex_violations', JSON.stringify(all));
+      return violation;
+    }
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('violations', 'readwrite');
+      const store = tx.objectStore('violations');
+      const req = store.put(violation);
+      req.onsuccess = () => resolve(violation);
+      req.onerror = (err) => reject(err);
+    });
+  }
+
+  async getViolations(limit = 100) {
+    if (!this.db) {
+      return this.getViolationsFromLS().slice(0, limit);
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('violations', 'readonly');
+      const store = tx.objectStore('violations');
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const results = req.result || [];
+        // Sort descending by timestamp
+        results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        resolve(results.slice(0, limit));
+      };
+      req.onerror = () => resolve([]);
+    });
+  }
+
+  async updateViolationStatus(challanNo, status) {
+    if (!this.db) {
+      const all = this.getViolationsFromLS();
+      const item = all.find(v => v.challanNo === challanNo);
+      if (item) {
+        item.status = status;
+        localStorage.setItem('kynex_violations', JSON.stringify(all));
+      }
+      return item;
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('violations', 'readwrite');
+      const store = tx.objectStore('violations');
+      const getReq = store.get(challanNo);
+      getReq.onsuccess = () => {
+        const record = getReq.result;
+        if (record) {
+          record.status = status;
+          store.put(record);
+        }
+        resolve(record);
+      };
+      getReq.onerror = () => resolve(null);
+    });
+  }
+
+  getViolationsFromLS() {
+    try {
+      const data = localStorage.getItem('kynex_violations');
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // --- MAPS ---
+
+  async saveMap(mapData) {
+    if (!mapData.id) {
+      mapData.id = 'map_' + Date.now();
+    }
+
+    if (!this.db) {
+      const maps = this.getMapsFromLS();
+      const idx = maps.findIndex(m => m.id === mapData.id);
+      if (idx >= 0) maps[idx] = mapData;
+      else maps.push(mapData);
+      localStorage.setItem('kynex_maps', JSON.stringify(maps));
+      return mapData;
+    }
+
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction('maps', 'readwrite');
+      const store = tx.objectStore('maps');
+      const req = store.put(mapData);
+      req.onsuccess = () => resolve(mapData);
+      req.onerror = (err) => reject(err);
+    });
+  }
+
+  async getMaps() {
+    if (!this.db) {
+      return this.getMapsFromLS();
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('maps', 'readonly');
+      const store = tx.objectStore('maps');
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve(this.defaultMaps);
+    });
+  }
+
+  async deleteMap(mapId) {
+    if (!this.db) {
+      let maps = this.getMapsFromLS();
+      maps = maps.filter(m => m.id !== mapId);
+      localStorage.setItem('kynex_maps', JSON.stringify(maps));
+      return true;
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('maps', 'readwrite');
+      const store = tx.objectStore('maps');
+      const req = store.delete(mapId);
+      req.onsuccess = () => resolve(true);
+      req.onerror = () => resolve(false);
+    });
+  }
+
+  getMapsFromLS() {
+    try {
+      const data = localStorage.getItem('kynex_maps');
+      return data ? JSON.parse(data) : this.defaultMaps;
+    } catch (e) {
+      return this.defaultMaps;
+    }
+  }
+
+  // --- AUDIT LOGS ---
+
+  async logAudit(operator, action, details) {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      displayTime: new Date().toLocaleTimeString(),
+      operator: operator || 'OPERATOR001',
+      action: action,
+      details: details
+    };
+
+    if (!this.db) {
+      const logs = this.getLogsFromLS();
+      logs.unshift(entry);
+      localStorage.setItem('kynex_audit_logs', JSON.stringify(logs.slice(0, 200)));
+      return entry;
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('audit_logs', 'readwrite');
+      const store = tx.objectStore('audit_logs');
+      const req = store.add(entry);
+      req.onsuccess = () => resolve(entry);
+      req.onerror = () => resolve(null);
+    });
+  }
+
+  async getAuditLogs(limit = 50) {
+    if (!this.db) {
+      return this.getLogsFromLS().slice(0, limit);
+    }
+
+    return new Promise((resolve) => {
+      const tx = this.db.transaction('audit_logs', 'readonly');
+      const store = tx.objectStore('audit_logs');
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const res = req.result || [];
+        res.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        resolve(res.slice(0, limit));
+      };
+      req.onerror = () => resolve([]);
+    });
+  }
+
+  getLogsFromLS() {
+    try {
+      const data = localStorage.getItem('kynex_audit_logs');
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // --- STATS & AGGREGATION ---
+
+  async getRevenueStats() {
+    const violations = await this.getViolations(1000);
+    const now = new Date();
+    const todayStr = now.toLocaleDateString();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let todayTotal = 0;
+    let monthTotal = 0;
+    let pendingCount = 0;
+    let paidCount = 0;
+
+    violations.forEach(v => {
+      const d = new Date(v.timestamp);
+      const fineVal = Number(v.fine) || 0;
+
+      if (d.toLocaleDateString() === todayStr) {
+        todayTotal += fineVal;
+      }
+      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+        monthTotal += fineVal;
+      }
+      if (v.status === 'Paid') {
+        paidCount++;
+      } else {
+        pendingCount++;
+      }
+    });
+
+    return {
+      todayTotal,
+      monthTotal,
+      totalCount: violations.length,
+      pendingCount,
+      paidCount
+    };
+  }
+
+  // --- EXPORT & IMPORT UTILITIES ---
+
+  // Export full backup as JSON
+  async exportBackupJSON() {
+    const violations = await this.getViolations(10000);
+    const maps = await this.getMaps();
+    const logs = await this.getAuditLogs(500);
+
+    const payload = {
+      system: 'KYNEX 2.0 Smart Traffic Management',
+      version: '2.0.0',
+      exportedAt: new Date().toISOString(),
+      data: {
+        violations,
+        maps,
+        logs
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kynex_traffic_backup_${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Export violations as CSV spreadsheet
+  async exportChallansCSV() {
+    const violations = await this.getViolations(5000);
+    if (violations.length === 0) {
+      alert('No violation records found to export.');
+      return;
+    }
+
+    const headers = ['Challan_No', 'Plate', 'Rule_Name', 'Section', 'Fine_INR', 'Speed', 'Junction', 'Date', 'Time', 'Status'];
+    const rows = violations.map(v => [
+      `"${v.challanNo}"`,
+      `"${v.plate}"`,
+      `"${v.ruleName}"`,
+      `"${v.section}"`,
+      v.fine,
+      `"${v.speed}"`,
+      `"${v.junctionName}"`,
+      `"${v.date}"`,
+      `"${v.displayTime}"`,
+      `"${v.status}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kynex_challans_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Import JSON backup
+  async importBackupJSON(jsonString) {
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (!parsed.data) throw new Error('Invalid backup structure');
+
+      if (Array.isArray(parsed.data.violations)) {
+        for (const v of parsed.data.violations) {
+          await this.saveViolation(v);
+        }
+      }
+      if (Array.isArray(parsed.data.maps)) {
+        for (const m of parsed.data.maps) {
+          await this.saveMap(m);
+        }
+      }
+      return { success: true, count: (parsed.data.violations || []).length };
+    } catch (e) {
+      console.error('Import failed:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  // Clear data
+  async clearAll() {
+    if (this.db) {
+      const tx = this.db.transaction(['violations', 'audit_logs'], 'readwrite');
+      tx.objectStore('violations').clear();
+      tx.objectStore('audit_logs').clear();
+    }
+    localStorage.removeItem('kynex_violations');
+    localStorage.removeItem('kynex_audit_logs');
+    return true;
+  }
+}
+
+// Global DB instance
+window.KynexDB = new KynexDatabase();
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” 2D High-Fidelity Tactical Traffic Simulator
+ * Features:
+ * - 60 FPS delta-time smooth physics (Intelligent Driver Model)
+ * - Safe bumper-to-bumper queuing without clipping or jumping
+ * - Complete 4-phase automated cyclic signal controller with countdown
+ * - Adaptive AI and Emergency Corridor pre-emption
+ * - Dynamic high-DPI canvas resizing
+ */
+
+class TrafficSim2D {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    
+    // Canvas dimensions
+    this.width = 600;
+    this.height = 600;
+    this.dpr = window.devicePixelRatio || 1;
+
+    // Simulation timing & speed
+    this.speedMultiplier = 2; // 1x, 2x, 3x
+    this.lastTime = performance.now();
+    this.isRunning = false;
+
+    // Signal Controller State
+    // Modes: 'auto', 'adaptive', 'manual'
+    this.mode = 'auto';
+    this.currentPhase = 0; // 0: NS Green, 1: NS Amber, 2: All Red, 3: EW Green, 4: EW Amber, 5: All Red
+    this.phaseTimer = 0;
+    
+    // User configured green durations
+    this.timings = {
+      north: 25,
+      south: 25,
+      east: 25,
+      west: 25
+    };
+    this.amberDuration = 3;
+    this.allRedDuration = 1.5;
+
+    // Signal states for directions
+    this.signals = {
+      north: 'red',
+      south: 'red',
+      east: 'green',
+      west: 'green'
+    };
+
+    // Emergency Corridor state
+    this.isEmergencyActive = false;
+    this.emergencyDirection = 'north';
+    this.emergencyCascadeStep = 0;
+    this.ambulanceVehicle = null;
+
+    // Vehicles containers per approach
+    this.vehicles = {
+      north: [],
+      south: [],
+      east: [],
+      west: []
+    };
+
+    // Pedestrians
+    this.pedestrians = [];
+
+    // Road Geometry parameters
+    this.roadWidth = 140; // width of each 2-lane road
+    this.laneWidth = 35;
+    this.stopDistance = 80; // distance from center to stop line
+
+    // Polyfill roundRect for older canvas engines if needed
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r = 0) {
+        if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
+        this.beginPath();
+        this.moveTo(x + (r.tl || 0), y);
+        this.lineTo(x + w - (r.tr || 0), y);
+        this.quadraticCurveTo(x + w, y, x + w, y + (r.tr || 0));
+        this.lineTo(x + w, y + h - (r.br || 0));
+        this.quadraticCurveTo(x + w, y + h, x + w - (r.br || 0), y + h);
+        this.lineTo(x + (r.bl || 0), y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - (r.bl || 0));
+        this.lineTo(x, y + (r.tl || 0));
+        this.quadraticCurveTo(x, y, x + (r.tl || 0), y);
+        this.closePath();
+        return this;
+      };
+    }
+
+    // Bind event listeners
+    this.resize = this.resize.bind(this);
+    window.addEventListener('resize', this.resize);
+    this.resize();
+  }
+
+  resize() {
+    if (!this.canvas) return;
+    const rect = this.canvas.parentElement.getBoundingClientRect();
+    this.width = Math.floor(rect.width) || 600;
+    this.height = Math.floor(rect.height) || 600;
+
+    this.canvas.width = this.width * this.dpr;
+    this.canvas.height = this.height * this.dpr;
+    this.canvas.style.width = this.width + 'px';
+    this.canvas.style.height = this.height + 'px';
+
+    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+  }
+
+  start() {
+    this.isRunning = true;
+    this.lastTime = performance.now();
+    this.loop = this.loop.bind(this);
+    requestAnimationFrame(this.loop);
+  }
+
+  stop() {
+    this.isRunning = false;
+  }
+
+  setSpeed(speed) {
+    this.speedMultiplier = Number(speed) || 1;
+  }
+
+  setMode(mode) {
+    this.mode = mode;
+  }
+
+  updateTiming(dir, seconds) {
+    this.timings[dir] = Number(seconds) || 20;
+  }
+
+  // --- TRAFFIC SIGNAL CYCLE CONTROLLER ---
+  updateSignalPhases(dt) {
+    if (this.isEmergencyActive) {
+      // In emergency, clear corridor for emergency route
+      if (this.emergencyDirection === 'north' || this.emergencyDirection === 'south') {
+        this.signals.north = 'green';
+        this.signals.south = 'green';
+        this.signals.east = 'red';
+        this.signals.west = 'red';
+      } else {
+        this.signals.north = 'red';
+        this.signals.south = 'red';
+        this.signals.east = 'green';
+        this.signals.west = 'green';
+      }
+      return;
+    }
+
+    if (this.mode === 'manual') return;
+
+    this.phaseTimer += dt * this.speedMultiplier;
+
+    const nsGreenTime = Math.max(this.timings.north, this.timings.south);
+    const ewGreenTime = Math.max(this.timings.east, this.timings.west);
+
+    switch (this.currentPhase) {
+      case 0: // NS Green
+        this.signals.north = 'green';
+        this.signals.south = 'green';
+        this.signals.east = 'red';
+        this.signals.west = 'red';
+        if (this.phaseTimer >= nsGreenTime) {
+          this.currentPhase = 1;
+          this.phaseTimer = 0;
+        }
+        break;
+
+      case 1: // NS Amber
+        this.signals.north = 'amber';
+        this.signals.south = 'amber';
+        this.signals.east = 'red';
+        this.signals.west = 'red';
+        if (this.phaseTimer >= this.amberDuration) {
+          this.currentPhase = 2;
+          this.phaseTimer = 0;
+        }
+        break;
+
+      case 2: // All Red Buffer
+        this.signals.north = 'red';
+        this.signals.south = 'red';
+        this.signals.east = 'red';
+        this.signals.west = 'red';
+        if (this.phaseTimer >= this.allRedDuration) {
+          this.currentPhase = 3;
+          this.phaseTimer = 0;
+        }
+        break;
+
+      case 3: // EW Green
+        this.signals.north = 'red';
+        this.signals.south = 'red';
+        this.signals.east = 'green';
+        this.signals.west = 'green';
+        if (this.phaseTimer >= ewGreenTime) {
+          this.currentPhase = 4;
+          this.phaseTimer = 0;
+        }
+        break;
+
+      case 4: // EW Amber
+        this.signals.north = 'red';
+        this.signals.south = 'red';
+        this.signals.east = 'amber';
+        this.signals.west = 'amber';
+        if (this.phaseTimer >= this.amberDuration) {
+          this.currentPhase = 5;
+          this.phaseTimer = 0;
+        }
+        break;
+
+      case 5: // All Red Buffer
+        this.signals.north = 'red';
+        this.signals.south = 'red';
+        this.signals.east = 'red';
+        this.signals.west = 'red';
+        if (this.phaseTimer >= this.allRedDuration) {
+          this.currentPhase = 0;
+          this.phaseTimer = 0;
+          
+          // If adaptive AI mode, dynamically bias next duration by queue length
+          if (this.mode === 'adaptive') {
+            this.evaluateAdaptiveFlow();
+          }
+        }
+        break;
+    }
+  }
+
+  evaluateAdaptiveFlow() {
+    const nsQueue = this.vehicles.north.filter(v => v.speed < 1).length + this.vehicles.south.filter(v => v.speed < 1).length;
+    const ewQueue = this.vehicles.east.filter(v => v.speed < 1).length + this.vehicles.west.filter(v => v.speed < 1).length;
+
+    if (nsQueue > ewQueue + 2) {
+      this.timings.north = Math.min(45, this.timings.north + 5);
+      this.timings.south = this.timings.north;
+      this.timings.east = Math.max(15, this.timings.east - 4);
+      this.timings.west = this.timings.east;
+    } else if (ewQueue > nsQueue + 2) {
+      this.timings.east = Math.min(45, this.timings.east + 5);
+      this.timings.west = this.timings.east;
+      this.timings.north = Math.max(15, this.timings.north - 4);
+      this.timings.south = this.timings.north;
+    }
+  }
+
+  // Get current active signal seconds left
+  getSecondsRemaining() {
+    let target = 0;
+    if (this.currentPhase === 0) target = Math.max(this.timings.north, this.timings.south);
+    else if (this.currentPhase === 1) target = this.amberDuration;
+    else if (this.currentPhase === 2) target = this.allRedDuration;
+    else if (this.currentPhase === 3) target = Math.max(this.timings.east, this.timings.west);
+    else if (this.currentPhase === 4) target = this.amberDuration;
+    else if (this.currentPhase === 5) target = this.allRedDuration;
+    return Math.max(0, Math.ceil(target - this.phaseTimer));
+  }
+
+  // --- VEHICLE SPAWNING & PHYSICS ---
+  spawnVehicle(dir, isAmbulance = false) {
+    const types = [
+      { type: 'car', length: 26, width: 14, color: '#3b82f6', maxSpeed: 60 },
+      { type: 'suv', length: 30, width: 16, color: '#10b981', maxSpeed: 55 },
+      { type: 'truck', length: 42, width: 18, color: '#f59e0b', maxSpeed: 45 },
+      { type: 'bike', length: 18, width: 8, color: '#a855f7', maxSpeed: 65 }
+    ];
+
+    let chosen = isAmbulance 
+      ? { type: 'ambulance', length: 32, width: 16, color: '#ffffff', maxSpeed: 80 }
+      : types[Math.floor(Math.random() * types.length)];
+
+    // Initial distance from spawn (0 at boundary)
+    const newVehicle = {
+      id: 'v_' + Math.random().toString(36).substr(2, 9),
+      dir: dir,
+      type: chosen.type,
+      length: chosen.length,
+      width: chosen.width,
+      color: chosen.color,
+      isAmbulance: isAmbulance,
+      pos: 0, // distance travelled along its approach line
+      speed: chosen.maxSpeed * 0.5,
+      targetSpeed: chosen.maxSpeed,
+      isBraking: false,
+      hasPassedIntersection: false,
+      lateralOffset: 0,
+      targetLateralOffset: 0,
+      turnIntent: Math.random() < 0.25 ? (Math.random() < 0.5 ? 'left' : 'right') : 'straight'
+    };
+
+    this.vehicles[dir].push(newVehicle);
+    if (isAmbulance) this.ambulanceVehicle = newVehicle;
+    return newVehicle;
+  }
+
+  updateVehicles(dt) {
+    const cx = this.width / 2;
+    const cy = this.height / 2;
+    const effectiveDt = Math.min(dt, 0.05) * this.speedMultiplier;
+
+    // Spawning logic (smooth stochastic rate)
+    const dirs = ['north', 'south', 'east', 'west'];
+    dirs.forEach(dir => {
+      // Don't overpopulate queue
+      if (this.vehicles[dir].length < 12) {
+        // Chance to spawn if spacing allows
+        const lastVehicle = this.vehicles[dir][this.vehicles[dir].length - 1];
+        if (!lastVehicle || lastVehicle.pos > 45) {
+          if (Math.random() < 0.03 * this.speedMultiplier) {
+            this.spawnVehicle(dir);
+          }
+        }
+      }
+    });
+
+    // Update each direction's vehicles
+    dirs.forEach(dir => {
+      const approachLength = (dir === 'north' || dir === 'south') ? (this.height / 2) : (this.width / 2);
+      const stopLinePos = approachLength - this.stopDistance;
+      const intersectionExitPos = approachLength + this.stopDistance;
+      const list = this.vehicles[dir];
+
+      for (let i = 0; i < list.length; i++) {
+        const v = list[i];
+        const ahead = list[i - 1]; // vehicle ahead in queue
+
+        let distanceToObstacle = 9999;
+        let obstacleSpeed = 0;
+
+        // 1. Check vehicle ahead
+        if (ahead) {
+          const gap = ahead.pos - v.pos - ahead.length;
+          distanceToObstacle = gap;
+          obstacleSpeed = ahead.speed;
+        }
+
+        // 2. Check traffic light if approaching intersection
+        const signal = this.signals[dir];
+        const distToStopLine = stopLinePos - v.pos;
+
+        if (distToStopLine > -5 && distToStopLine < 160) {
+          // If ambulance, ignore red light!
+          if (v.isAmbulance) {
+            // green pass
+          } else if (signal === 'red') {
+            if (distToStopLine < distanceToObstacle) {
+              distanceToObstacle = Math.max(0, distToStopLine);
+              obstacleSpeed = 0;
+            }
+          } else if (signal === 'amber') {
+            // If vehicle is too close to stop line, it passes through; otherwise it smoothly brakes
+            if (distToStopLine > 35 && distToStopLine < distanceToObstacle) {
+              distanceToObstacle = distToStopLine;
+              obstacleSpeed = 0;
+            }
+          }
+        }
+
+        // 3. Intelligent Driver Physics calculation
+        const safeDistance = 20; // minimum bumper distance
+        const desiredSpeed = v.targetSpeed;
+        const maxAcceleration = 28; // pixels/s^2
+        const comfortableBraking = 38; // pixels/s^2
+
+        let acceleration = 0;
+
+        if (distanceToObstacle > 180) {
+          // Free road: accelerate smoothly to desired speed
+          acceleration = maxAcceleration * (1 - (v.speed / desiredSpeed));
+          v.isBraking = false;
+        } else {
+          // Approaching vehicle or red light: compute safe deceleration
+          const deltaV = v.speed - obstacleSpeed;
+          const sStar = safeDistance + Math.max(0, (v.speed * 0.8) + ((v.speed * deltaV) / (2 * Math.sqrt(maxAcceleration * comfortableBraking))));
+          
+          acceleration = maxAcceleration * (1 - Math.pow(v.speed / desiredSpeed, 4) - Math.pow(sStar / Math.max(distanceToObstacle, 1), 2));
+          v.isBraking = acceleration < -2;
+        }
+
+        // Apply physics
+        v.speed = Math.max(0, Math.min(desiredSpeed, v.speed + acceleration * effectiveDt));
+        v.pos += v.speed * effectiveDt;
+
+        // --- RESCUE LANE (RETTUNGSGASSE) LATERAL YIELDING ---
+        // When ambulance approaches, vehicles part to left and right shoulders!
+        if (this.isEmergencyActive && dir === this.emergencyDirection && !v.isAmbulance) {
+          // Odd vehicles pull left (-22px), even vehicles pull right (+22px)
+          v.targetLateralOffset = (i % 2 === 0) ? -22 : 22;
+        } else {
+          v.targetLateralOffset = 0;
+        }
+        // Smooth steering transition
+        v.lateralOffset += (v.targetLateralOffset - v.lateralOffset) * Math.min(1, 4 * effectiveDt);
+
+        if (v.pos > stopLinePos + 10) {
+          v.hasPassedIntersection = true;
+        }
+      }
+
+      // Remove vehicles that exited the map
+      const maxDistance = (dir === 'north' || dir === 'south') ? this.height + 100 : this.width + 100;
+      this.vehicles[dir] = list.filter(v => v.pos < maxDistance);
+    });
+
+    // Update emergency ambulance cascade if active
+    if (this.isEmergencyActive && this.ambulanceVehicle) {
+      if (this.ambulanceVehicle.hasPassedIntersection) {
+        // Complete emergency clearing
+        setTimeout(() => {
+          this.endEmergency();
+        }, 1500);
+      }
+    }
+  }
+
+  // --- DRAWING FUNCTIONS ---
+  draw() {
+    const cx = this.width / 2;
+    const cy = this.height / 2;
+    const ctx = this.ctx;
+
+    // 1. Clear background
+    ctx.fillStyle = '#0a0f1d';
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    // 2. City Blocks / Sidewalks
+    ctx.fillStyle = '#0f172a';
+    // Top-Left block
+    ctx.fillRect(0, 0, cx - this.roadWidth / 2, cy - this.roadWidth / 2);
+    // Top-Right block
+    ctx.fillRect(cx + this.roadWidth / 2, 0, this.width - (cx + this.roadWidth / 2), cy - this.roadWidth / 2);
+    // Bottom-Left block
+    ctx.fillRect(0, cy + this.roadWidth / 2, cx - this.roadWidth / 2, this.height - (cy + this.roadWidth / 2));
+    // Bottom-Right block
+    ctx.fillRect(cx + this.roadWidth / 2, cy + this.roadWidth / 2, this.width - (cx + this.roadWidth / 2), this.height - (cy + this.roadWidth / 2));
+
+    // Curbside borders
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(0, 0, cx - this.roadWidth / 2, cy - this.roadWidth / 2);
+    ctx.strokeRect(cx + this.roadWidth / 2, 0, this.width - (cx + this.roadWidth / 2), cy - this.roadWidth / 2);
+    ctx.strokeRect(0, cy + this.roadWidth / 2, cx - this.roadWidth / 2, this.height - (cy + this.roadWidth / 2));
+    ctx.strokeRect(cx + this.roadWidth / 2, cy + this.roadWidth / 2, this.width - (cx + this.roadWidth / 2), this.height - (cy + this.roadWidth / 2));
+
+    // 3. Roads Asphalt
+    ctx.fillStyle = '#172033';
+    // Vertical road
+    ctx.fillRect(cx - this.roadWidth / 2, 0, this.roadWidth, this.height);
+    // Horizontal road
+    ctx.fillRect(0, cy - this.roadWidth / 2, this.width, this.roadWidth);
+
+    // 4. Central Intersection Box
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(cx - this.roadWidth / 2, cy - this.roadWidth / 2, this.roadWidth, this.roadWidth);
+
+    // Yellow Box Junction Marking (Diagonal hatching)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx - this.roadWidth / 2, cy - this.roadWidth / 2, this.roadWidth, this.roadWidth);
+    ctx.clip();
+    ctx.strokeStyle = 'rgba(234, 179, 8, 0.15)';
+    ctx.lineWidth = 2;
+    for (let x = -this.roadWidth; x < this.roadWidth * 2; x += 16) {
+      ctx.beginPath();
+      ctx.moveTo(cx - this.roadWidth / 2 + x, cy - this.roadWidth / 2);
+      ctx.lineTo(cx - this.roadWidth / 2 + x + this.roadWidth, cy + this.roadWidth / 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 5. Road Lane Markings
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([12, 12]);
+
+    // Center divider lines
+    // North center line
+    ctx.beginPath();
+    ctx.moveTo(cx, 0);
+    ctx.lineTo(cx, cy - this.roadWidth / 2 - 20);
+    ctx.stroke();
+
+    // South center line
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + this.roadWidth / 2 + 20);
+    ctx.lineTo(cx, this.height);
+    ctx.stroke();
+
+    // East center line
+    ctx.beginPath();
+    ctx.moveTo(cx + this.roadWidth / 2 + 20, cy);
+    ctx.lineTo(this.width, cy);
+    ctx.stroke();
+
+    // West center line
+    ctx.beginPath();
+    ctx.moveTo(0, cy);
+    ctx.lineTo(cx - this.roadWidth / 2 - 20, cy);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    // 6. Stop Lines & Zebra Crosswalks
+    this.drawCrosswalks(cx, cy);
+
+    // 7. Draw Vehicles
+    this.drawAllVehicles(cx, cy);
+
+    // 8. Traffic Signal Lanterns (High Visibility Gantries)
+    this.drawSignals(cx, cy);
+  }
+
+  drawCrosswalks(cx, cy) {
+    const ctx = this.ctx;
+    const rw = this.roadWidth;
+    const barWidth = 6;
+    const barSpacing = 10;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+
+    // North crosswalk
+    for (let x = cx - rw / 2 + 6; x < cx + rw / 2 - 6; x += barSpacing) {
+      ctx.fillRect(x, cy - rw / 2 - 18, barWidth, 14);
+    }
+    // Stop line North
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx - rw / 2, cy - rw / 2 - 24, rw / 2, 4);
+
+    // South crosswalk
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    for (let x = cx - rw / 2 + 6; x < cx + rw / 2 - 6; x += barSpacing) {
+      ctx.fillRect(x, cy + rw / 2 + 4, barWidth, 14);
+    }
+    // Stop line South
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx, cy + rw / 2 + 20, rw / 2, 4);
+
+    // East crosswalk
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    for (let y = cy - rw / 2 + 6; y < cy + rw / 2 - 6; y += barSpacing) {
+      ctx.fillRect(cx + rw / 2 + 4, y, 14, barWidth);
+    }
+    // Stop line East
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx + rw / 2 + 20, cy - rw / 2, 4, rw / 2);
+
+    // West crosswalk
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    for (let y = cy - rw / 2 + 6; y < cy + rw / 2 - 6; y += barSpacing) {
+      ctx.fillRect(cx - rw / 2 - 18, y, 14, barWidth);
+    }
+    // Stop line West
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx - rw / 2 - 24, cy, 4, rw / 2);
+  }
+
+  drawAllVehicles(cx, cy) {
+    const ctx = this.ctx;
+    const laneOffset = this.laneWidth * 0.55;
+
+    // Helper to draw a single vehicle with headlights, taillights, windows
+    const renderVehicle = (v, px, py, angle) => {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(angle);
+
+      // Headlight glow
+      const grad = ctx.createRadialGradient(0, -v.length / 2 - 10, 2, 0, -v.length / 2 - 20, 35);
+      grad.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+      grad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(-v.width * 0.8, -v.length / 2);
+      ctx.lineTo(-v.width * 2, -v.length / 2 - 40);
+      ctx.lineTo(v.width * 2, -v.length / 2 - 40);
+      ctx.lineTo(v.width * 0.8, -v.length / 2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Vehicle Body
+      ctx.fillStyle = v.color;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1.5;
+      
+      const r = 3;
+      ctx.beginPath();
+      ctx.roundRect(-v.width / 2, -v.length / 2, v.width, v.length, r);
+      ctx.fill();
+      ctx.stroke();
+
+      // Windshield & Roof
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-v.width / 2 + 2, -v.length / 2 + 5, v.width - 4, v.length * 0.35);
+
+      // Brake lights (Bright red when decelerating)
+      if (v.isBraking) {
+        ctx.fillStyle = '#ef4444';
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 10;
+      } else {
+        ctx.fillStyle = '#7f1d1d';
+        ctx.shadowBlur = 0;
+      }
+      ctx.fillRect(-v.width / 2 + 1, v.length / 2 - 3, 4, 3);
+      ctx.fillRect(v.width / 2 - 5, v.length / 2 - 3, 4, 3);
+      ctx.shadowBlur = 0;
+
+      // Ambulance flashing siren beacon
+      if (v.isAmbulance) {
+        const flashTime = (Date.now() % 400) < 200;
+        ctx.fillStyle = flashTime ? '#3b82f6' : '#ef4444';
+        ctx.shadowColor = flashTime ? '#3b82f6' : '#ef4444';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Red cross symbol on roof
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(-1.5, -6, 3, 12);
+        ctx.fillRect(-6, -1.5, 12, 3);
+      }
+
+      ctx.restore();
+    };
+
+    // North vehicles (moving down, Southbound, lane: cx - laneOffset)
+    this.vehicles.north.forEach(v => {
+      const px = cx - laneOffset + (v.lateralOffset || 0);
+      const py = v.pos;
+      renderVehicle(v, px, py, Math.PI); // facing down
+    });
+
+    // South vehicles (moving up, Northbound, lane: cx + laneOffset)
+    this.vehicles.south.forEach(v => {
+      const px = cx + laneOffset + (v.lateralOffset || 0);
+      const py = this.height - v.pos;
+      renderVehicle(v, px, py, 0); // facing up
+    });
+
+    // East vehicles (moving left, Westbound, lane: cy - laneOffset)
+    this.vehicles.east.forEach(v => {
+      const px = this.width - v.pos;
+      const py = cy - laneOffset + (v.lateralOffset || 0);
+      renderVehicle(v, px, py, -Math.PI / 2); // facing left
+    });
+
+    // West vehicles (moving right, Eastbound, lane: cy + laneOffset)
+    this.vehicles.west.forEach(v => {
+      const px = v.pos;
+      const py = cy + laneOffset + (v.lateralOffset || 0);
+      renderVehicle(v, px, py, Math.PI / 2); // facing right
+    });
+  }
+
+  drawSignals(cx, cy) {
+    const ctx = this.ctx;
+    const rw = this.roadWidth;
+    const remainingSecs = this.getSecondsRemaining();
+
+    const signalPoles = [
+      { dir: 'north', x: cx - rw / 2 - 20, y: cy - rw / 2 - 35, label: 'N â†“', status: this.signals.north },
+      { dir: 'south', x: cx + rw / 2 + 20, y: cy + rw / 2 + 35, label: 'S â†‘', status: this.signals.south },
+      { dir: 'east', x: cx + rw / 2 + 35, y: cy - rw / 2 - 20, label: 'E â†', status: this.signals.east },
+      { dir: 'west', x: cx - rw / 2 - 35, y: cy + rw / 2 + 20, label: 'W â†’', status: this.signals.west }
+    ];
+
+    signalPoles.forEach(pole => {
+      // Signal housing box
+      ctx.fillStyle = '#090d16';
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(pole.x - 14, pole.y - 32, 28, 64, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // 3 Lights (Red, Amber, Green)
+      const lights = [
+        { color: pole.status === 'red' ? '#ef4444' : '#450a0a', active: pole.status === 'red', y: pole.y - 18 },
+        { color: pole.status === 'amber' ? '#eab308' : '#422006', active: pole.status === 'amber', y: pole.y },
+        { color: pole.status === 'green' ? '#22c55e' : '#052e16', active: pole.status === 'green', y: pole.y + 18 }
+      ];
+
+      lights.forEach(l => {
+        ctx.fillStyle = l.color;
+        if (l.active) {
+          ctx.shadowColor = l.color;
+          ctx.shadowBlur = 12;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.beginPath();
+        ctx.arc(pole.x, l.y, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Digital Countdown Timer Badge
+      ctx.fillStyle = 'rgba(7, 11, 20, 0.85)';
+      ctx.strokeStyle = pole.status === 'green' ? '#22c55e' : (pole.status === 'amber' ? '#eab308' : '#ef4444');
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(pole.x - 14, pole.y + 36, 28, 16, 3);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${remainingSecs}s`, pole.x, pole.y + 44);
+
+      // Label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText(pole.label, pole.x, pole.y - 40);
+    });
+
+    // Overhead Dynamic Variable Message Signboard (VMS) when emergency is active
+    if (this.isEmergencyActive) {
+      const flash = (Date.now() % 500) < 250;
+      ctx.fillStyle = 'rgba(7, 11, 20, 0.94)';
+      ctx.strokeStyle = flash ? '#ef4444' : '#38bdf8';
+      ctx.lineWidth = 2;
+      const vmsW = 360;
+      const vmsH = 36;
+      ctx.beginPath();
+      ctx.roundRect(cx - vmsW / 2, cy - this.roadWidth / 2 - 64, vmsW, vmsH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = flash ? '#fca5a5' : '#ffffff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('ðŸš¨ PRIORITY 1: AMBULANCE IN TRANSIT â€” CLEAR SIDES', cx, cy - this.roadWidth / 2 - 46);
+    }
+  }
+
+  // --- EMERGENCY AMBULANCE TRIGGER ---
+  triggerEmergencyCorridor(direction = 'north') {
+    if (this.isEmergencyActive) return false;
+
+    this.isEmergencyActive = true;
+    this.emergencyDirection = direction;
+    this.emergencyCascadeStep = 1;
+
+    // Force conflicting signals to Amber immediately, then Red
+    this.signals.east = 'amber';
+    this.signals.west = 'amber';
+
+    setTimeout(() => {
+      this.signals.east = 'red';
+      this.signals.west = 'red';
+      this.signals.north = 'green';
+      this.signals.south = 'green';
+      this.emergencyCascadeStep = 2;
+
+      // Spawn emergency vehicle approaching intersection
+      this.spawnVehicle(direction, true);
+    }, 1200);
+
+    return true;
+  }
+
+  endEmergency() {
+    this.isEmergencyActive = false;
+    this.emergencyCascadeStep = 0;
+    this.ambulanceVehicle = null;
+    this.currentPhase = 0;
+    this.phaseTimer = 0;
+  }
+
+  // --- MAIN SIMULATION TICK ---
+  loop(time) {
+    if (!this.isRunning) return;
+
+    const dt = Math.min((time - this.lastTime) / 1000, 0.1);
+    this.lastTime = time;
+
+    this.updateSignalPhases(dt);
+    this.updateVehicles(dt);
+    this.draw();
+
+    requestAnimationFrame(this.loop);
+  }
+}
+
+window.TrafficSim2D = TrafficSim2D;
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” 3D Cyberpunk Intersection Simulation Engine
+ * Built with Three.js (WebGL)
+ * Features:
+ * - 3D procedural roads, crosswalks, streetlights, and skyline buildings
+ * - 3D dynamic vehicles with headlights and illuminated brake lights
+ * - 3D traffic signal gantries with volumetric emissive light
+ * - 3D emergency ambulance with rotating dual red/blue beacon lights
+ * - Interactive OrbitControls and cinematic camera presets
+ */
+
+class TrafficSim3D {
+  constructor(containerId, sim2dInstance) {
+    this.container = document.getElementById(containerId);
+    this.sim2d = sim2dInstance; // synchronized with 2D physics engine
+    
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.controls = null;
+    this.isRunning = false;
+
+    // 3D Meshes cache for vehicles
+    this.vehicleMeshes = new Map(); // id -> THREE.Group
+    this.signalLamps = {}; // dir -> { red, amber, green, light }
+
+    this.ambulanceBeaconLight = null;
+
+    // Camera presets
+    this.cameraPresets = {
+      isometric: { pos: [220, 240, 220], target: [0, 0, 0] },
+      topdown: { pos: [0, 360, 1], target: [0, 0, 0] },
+      street: { pos: [-120, 25, 120], target: [0, 5, 0] },
+      chase: { pos: [0, 40, -140], target: [0, 0, 0] }
+    };
+  }
+
+  init() {
+    if (this.scene) return; // already initialized
+
+    const width = this.container.clientWidth || 600;
+    const height = this.container.clientHeight || 600;
+
+    // 1. Scene
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x070b14);
+    this.scene.fog = new THREE.FogExp2(0x070b14, 0.0018);
+
+    // 2. Camera
+    this.camera = new THREE.PerspectiveCamera(45, width / height, 1, 1500);
+    this.setCameraPreset('isometric');
+
+    // 3. Renderer
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.container.appendChild(this.renderer.domElement);
+
+    // 4. OrbitControls
+    if (window.THREE && window.THREE.OrbitControls) {
+      this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.enableDamping = true;
+      this.controls.dampingFactor = 0.05;
+      this.controls.maxPolarAngle = Math.PI / 2 - 0.02; // don't go below ground
+      this.controls.minDistance = 40;
+      this.controls.maxDistance = 600;
+    }
+
+    // 5. Lighting
+    this.setupLighting();
+
+    // 6. Environment (Roads, Sidewalks, Buildings, Signal Poles)
+    this.createEnvironment();
+
+    // 7. Handle Resize
+    this.onResize = this.onResize.bind(this);
+    window.addEventListener('resize', this.onResize);
+  }
+
+  setupLighting() {
+    // Ambient moon / cyber glow
+    const ambientLight = new THREE.AmbientLight(0x1e293b, 1.2);
+    this.scene.add(ambientLight);
+
+    // Soft directional moonlight
+    const dirLight = new THREE.DirectionalLight(0x60a5fa, 0.8);
+    dirLight.position.set(150, 300, 100);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    this.scene.add(dirLight);
+
+    // Street illumination center
+    const centerLight = new THREE.PointLight(0x38bdf8, 0.5, 250);
+    centerLight.position.set(0, 45, 0);
+    this.scene.add(centerLight);
+  }
+
+  createEnvironment() {
+    const roadWidth = 80;
+    const worldSize = 800;
+
+    // Ground / Terrain
+    const groundGeo = new THREE.PlaneGeometry(worldSize, worldSize);
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a0f1d, roughness: 0.9 });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    this.scene.add(ground);
+
+    // Asphalt Roads (Cross layout)
+    const asphaltMat = new THREE.MeshStandardMaterial({ color: 0x172033, roughness: 0.7 });
+    
+    // North-South road
+    const nsRoad = new THREE.Mesh(new THREE.PlaneGeometry(roadWidth, worldSize), asphaltMat);
+    nsRoad.rotation.x = -Math.PI / 2;
+    nsRoad.position.y = 0.1;
+    nsRoad.receiveShadow = true;
+    this.scene.add(nsRoad);
+
+    // East-West road
+    const ewRoad = new THREE.Mesh(new THREE.PlaneGeometry(worldSize, roadWidth), asphaltMat);
+    ewRoad.rotation.x = -Math.PI / 2;
+    ewRoad.position.y = 0.1;
+    ewRoad.receiveShadow = true;
+    this.scene.add(ewRoad);
+
+    // Yellow Box Junction Marking in intersection
+    const boxMat = new THREE.MeshBasicMaterial({ color: 0xeab308, wireframe: true });
+    const boxGrid = new THREE.Mesh(new THREE.PlaneGeometry(roadWidth * 0.9, roadWidth * 0.9, 6, 6), boxMat);
+    boxGrid.rotation.x = -Math.PI / 2;
+    boxGrid.position.y = 0.15;
+    this.scene.add(boxGrid);
+
+    // Crosswalk Striping (White bars)
+    this.createCrosswalks3D(roadWidth);
+
+    // Street Light Poles & Signal Gantries
+    this.createSignalGantries3D(roadWidth);
+
+    // Overhead 3D Dynamic VMS Digital Signboard Gantry
+    this.createVMSGantry3D(roadWidth);
+
+    // Surrounding Low-poly City Skyline Buildings
+    this.createSkylineBuildings3D(roadWidth);
+  }
+
+  createCrosswalks3D(rw) {
+    const barGeo = new THREE.PlaneGeometry(3, 10);
+    const barMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+
+    // North & South
+    [-rw/2 - 10, rw/2 + 10].forEach(z => {
+      for (let x = -rw/2 + 4; x <= rw/2 - 4; x += 6) {
+        const stripe = new THREE.Mesh(barGeo, barMat);
+        stripe.rotation.x = -Math.PI / 2;
+        stripe.position.set(x, 0.2, z);
+        this.scene.add(stripe);
+      }
+    });
+
+    // East & West
+    const barGeoH = new THREE.PlaneGeometry(10, 3);
+    [-rw/2 - 10, rw/2 + 10].forEach(x => {
+      for (let z = -rw/2 + 4; z <= rw/2 - 4; z += 6) {
+        const stripe = new THREE.Mesh(barGeoH, barMat);
+        stripe.rotation.x = -Math.PI / 2;
+        stripe.position.set(x, 0.2, z);
+        this.scene.add(stripe);
+      }
+    });
+  }
+
+  createSignalGantries3D(rw) {
+    const gantryMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.3 });
+    const directions = [
+      { dir: 'north', pos: [-rw/2 - 8, 0, -rw/2 - 12], rot: 0 },
+      { dir: 'south', pos: [rw/2 + 8, 0, rw/2 + 12], rot: Math.PI },
+      { dir: 'east', pos: [rw/2 + 12, 0, -rw/2 - 8], rot: -Math.PI / 2 },
+      { dir: 'west', pos: [-rw/2 - 12, 0, rw/2 + 8], rot: Math.PI / 2 }
+    ];
+
+    directions.forEach(item => {
+      const gantryGroup = new THREE.Group();
+      gantryGroup.position.set(item.pos[0], 0, item.pos[2]);
+      gantryGroup.rotation.y = item.rot;
+
+      // Vertical post
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 28, 8), gantryMat);
+      post.position.y = 14;
+      gantryGroup.add(post);
+
+      // Horizontal arm
+      const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 18, 8), gantryMat);
+      arm.rotation.z = Math.PI / 2;
+      arm.position.set(9, 27, 0);
+      gantryGroup.add(arm);
+
+      // Signal Head Box
+      const box = new THREE.Mesh(new THREE.BoxGeometry(4, 11, 3.5), new THREE.MeshStandardMaterial({ color: 0x090d16 }));
+      box.position.set(14, 23, 0);
+      gantryGroup.add(box);
+
+      // 3 Lamps: Red, Amber, Green
+      const lampGeo = new THREE.SphereGeometry(1.1, 16, 16);
+      
+      const redMat = new THREE.MeshStandardMaterial({ color: 0x330000, emissive: 0x000000 });
+      const redLamp = new THREE.Mesh(lampGeo, redMat);
+      redLamp.position.set(14, 26.5, 1.8);
+      gantryGroup.add(redLamp);
+
+      const amberMat = new THREE.MeshStandardMaterial({ color: 0x332200, emissive: 0x000000 });
+      const amberLamp = new THREE.Mesh(lampGeo, amberMat);
+      amberLamp.position.set(14, 23, 1.8);
+      gantryGroup.add(amberLamp);
+
+      const greenMat = new THREE.MeshStandardMaterial({ color: 0x003311, emissive: 0x000000 });
+      const greenLamp = new THREE.Mesh(lampGeo, greenMat);
+      greenLamp.position.set(14, 19.5, 1.8);
+      gantryGroup.add(greenLamp);
+
+      // Dynamic signal point light casting light onto the roadway
+      const light = new THREE.PointLight(0x22c55e, 0.8, 45);
+      light.position.set(14, 23, 4);
+      gantryGroup.add(light);
+
+      this.scene.add(gantryGroup);
+
+      this.signalLamps[item.dir] = {
+        red: redLamp,
+        amber: amberLamp,
+        green: greenLamp,
+        light: light
+      };
+    });
+  }
+
+  createVMSGantry3D(rw) {
+    const gantryGroup = new THREE.Group();
+    const gantryMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.7, roughness: 0.3 });
+    const zPos = -rw / 2 - 28;
+
+    // Left pillar
+    const leftPost = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 32, 8), gantryMat);
+    leftPost.position.set(-rw / 2 - 8, 16, zPos);
+    gantryGroup.add(leftPost);
+
+    // Right pillar
+    const rightPost = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.4, 32, 8), gantryMat);
+    rightPost.position.set(rw / 2 + 8, 16, zPos);
+    gantryGroup.add(rightPost);
+
+    // Overhead truss beam
+    const truss = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, rw + 20, 8), gantryMat);
+    truss.rotation.z = Math.PI / 2;
+    truss.position.set(0, 31, zPos);
+    gantryGroup.add(truss);
+
+    // Digital LED Signboard Box
+    const signMat = new THREE.MeshStandardMaterial({
+      color: 0x090d16,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.5,
+      roughness: 0.2
+    });
+    const signBox = new THREE.Mesh(new THREE.BoxGeometry(rw * 0.85, 8, 2.5), signMat);
+    signBox.position.set(0, 27, zPos);
+    gantryGroup.add(signBox);
+    this.vmsSignMesh = signBox;
+
+    this.scene.add(gantryGroup);
+  }
+
+  createSkylineBuildings3D(rw) {
+    const buildingMat = new THREE.MeshStandardMaterial({ color: 0x0e172a, roughness: 0.8, metalness: 0.2 });
+    const windowMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+
+    const quadrants = [
+      { ox: -200, oz: -200 },
+      { ox: 200, oz: -200 },
+      { ox: -200, oz: 200 },
+      { ox: 200, oz: 200 }
+    ];
+
+    quadrants.forEach(q => {
+      for (let i = 0; i < 5; i++) {
+        const bx = q.ox + (Math.random() - 0.5) * 140;
+        const bz = q.oz + (Math.random() - 0.5) * 140;
+        const bw = 30 + Math.random() * 35;
+        const bd = 30 + Math.random() * 35;
+        const bh = 50 + Math.random() * 120;
+
+        const building = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), buildingMat);
+        building.position.set(bx, bh / 2, bz);
+        building.castShadow = true;
+        building.receiveShadow = true;
+        this.scene.add(building);
+
+        // Rooftop antenna beacon
+        if (bh > 90) {
+          const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 16), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+          antenna.position.set(bx, bh + 8, bz);
+          this.scene.add(antenna);
+        }
+      }
+    });
+  }
+
+  // --- 3D VEHICLE MESH BUILDERS ---
+  createVehicleMesh3D(vehicle) {
+    const group = new THREE.Group();
+
+    const carColor = vehicle.isAmbulance ? 0xffffff : (new THREE.Color(vehicle.color).getHex());
+    const bodyMat = new THREE.MeshStandardMaterial({ color: carColor, roughness: 0.3, metalness: 0.4 });
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.8 });
+
+    const scale = 0.55;
+    const w = vehicle.width * scale;
+    const l = vehicle.length * scale;
+    const h = (vehicle.type === 'suv' || vehicle.isAmbulance) ? 8 : (vehicle.type === 'truck' ? 12 : 6);
+
+    // Main Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, l), bodyMat);
+    body.position.y = h / 2 + 1.5;
+    body.castShadow = true;
+    group.add(body);
+
+    // Cabin / Windshield
+    if (vehicle.type !== 'bike') {
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(w * 0.85, h * 0.7, l * 0.55), glassMat);
+      cabin.position.set(0, h + 1.5, -l * 0.05);
+      group.add(cabin);
+    }
+
+    // Wheels
+    const wheelGeo = new THREE.CylinderGeometry(1.8, 1.8, 1.2, 12);
+    const wheelPositions = [
+      [-w/2 - 0.4, 1.8, -l * 0.3],
+      [w/2 + 0.4, 1.8, -l * 0.3],
+      [-w/2 - 0.4, 1.8, l * 0.3],
+      [w/2 + 0.4, 1.8, l * 0.3]
+    ];
+
+    wheelPositions.forEach(pos => {
+      const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(pos[0], pos[1], pos[2]);
+      group.add(wheel);
+    });
+
+    // Headlights
+    const headlightMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+    const hl1 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1, 0.4), headlightMat);
+    hl1.position.set(-w * 0.3, h * 0.6, -l / 2 - 0.2);
+    const hl2 = hl1.clone();
+    hl2.position.set(w * 0.3, h * 0.6, -l / 2 - 0.2);
+    group.add(hl1);
+    group.add(hl2);
+
+    // Tail / Brake Lights
+    const tailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+    const tl1 = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.8, 0.4), tailMat);
+    tl1.position.set(-w * 0.32, h * 0.6, l / 2 + 0.2);
+    const tl2 = tl1.clone();
+    tl2.position.set(w * 0.32, h * 0.6, l / 2 + 0.2);
+    group.add(tl1);
+    group.add(tl2);
+    group.userData.brakeLights = [tl1, tl2];
+
+    // Ambulance Emergency Rotating Siren Beacon
+    if (vehicle.isAmbulance) {
+      const beaconGeo = new THREE.BoxGeometry(2.5, 1.5, 4);
+      const beaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+      beacon.position.set(0, h * 1.6 + 1.5, 0);
+      group.add(beacon);
+
+      const beaconLight = new THREE.PointLight(0xef4444, 2.5, 40);
+      beaconLight.position.set(0, h * 1.8, 0);
+      group.add(beaconLight);
+      group.userData.beaconLight = beaconLight;
+      group.userData.beacon = beacon;
+    }
+
+    this.scene.add(group);
+    return group;
+  }
+
+  // --- SYNCHRONIZE WITH 2D SIMULATION STATE ---
+  syncWith2DSim() {
+    if (!this.sim2d) return;
+
+    // 1. Update Signals Lamps & Lights
+    const sigs = this.sim2d.signals;
+    ['north', 'south', 'east', 'west'].forEach(dir => {
+      const state = sigs[dir];
+      const lamps = this.signalLamps[dir];
+      if (!lamps) return;
+
+      // Reset
+      lamps.red.material.emissive.setHex(state === 'red' ? 0xef4444 : 0x000000);
+      lamps.amber.material.emissive.setHex(state === 'amber' ? 0xeab308 : 0x000000);
+      lamps.green.material.emissive.setHex(state === 'green' ? 0x22c55e : 0x000000);
+
+      let color = 0x22c55e;
+      if (state === 'red') color = 0xef4444;
+      else if (state === 'amber') color = 0xeab308;
+      lamps.light.color.setHex(color);
+      lamps.light.intensity = 1.0;
+    });
+
+    // 2. Synchronize Vehicles
+    const activeIds = new Set();
+    const laneOffset = 18; // 3D units
+
+    ['north', 'south', 'east', 'west'].forEach(dir => {
+      const list = this.sim2d.vehicles[dir];
+      list.forEach(v => {
+        activeIds.add(v.id);
+
+        let mesh = this.vehicleMeshes.get(v.id);
+        if (!mesh) {
+          mesh = this.createVehicleMesh3D(v);
+          this.vehicleMeshes.set(v.id, mesh);
+        }
+
+        // Map 2D position (pixels) to 3D units (world coordinates)
+        // 2D: center is (cx, cy). Max distance ~600px -> 3D world ~400 units
+        const scale3D = 0.55;
+        const distFromCenter = (v.pos - (this.sim2d.height / 2)) * scale3D;
+
+        const lateral3D = (v.lateralOffset || 0) * scale3D;
+
+        if (dir === 'north') {
+          // Coming from North (z < 0) moving South (+z), lane: x = -laneOffset
+          mesh.position.set(-laneOffset + lateral3D, 0, distFromCenter);
+          mesh.rotation.y = 0;
+        } else if (dir === 'south') {
+          // Coming from South (z > 0) moving North (-z), lane: x = laneOffset
+          mesh.position.set(laneOffset + lateral3D, 0, -distFromCenter);
+          mesh.rotation.y = Math.PI;
+        } else if (dir === 'east') {
+          // Coming from East (x > 0) moving West (-x), lane: z = -laneOffset
+          mesh.position.set(-distFromCenter, 0, -laneOffset + lateral3D);
+          mesh.rotation.y = -Math.PI / 2;
+        } else if (dir === 'west') {
+          // Coming from West (x < 0) moving East (+x), lane: z = laneOffset
+          mesh.position.set(distFromCenter, 0, laneOffset + lateral3D);
+          mesh.rotation.y = Math.PI / 2;
+        }
+
+        // Brake lights update
+        if (mesh.userData.brakeLights) {
+          const tailColor = v.isBraking ? 0xff2222 : 0x660000;
+          mesh.userData.brakeLights.forEach(tl => tl.material.color.setHex(tailColor));
+        }
+
+        // Ambulance siren strobe
+        if (v.isAmbulance && mesh.userData.beaconLight) {
+          const isBlue = (Date.now() % 350) < 175;
+          const strobeColor = isBlue ? 0x3b82f6 : 0xef4444;
+          mesh.userData.beaconLight.color.setHex(strobeColor);
+          mesh.userData.beacon.material.color.setHex(strobeColor);
+        }
+      });
+    });
+
+    // Remove deleted vehicles
+    for (const [id, mesh] of this.vehicleMeshes.entries()) {
+      if (!activeIds.has(id)) {
+        this.scene.remove(mesh);
+        this.vehicleMeshes.delete(id);
+      }
+    }
+
+    // 3. Synchronize 3D VMS Overhead Signboard
+    if (this.vmsSignMesh) {
+      if (this.sim2d.isEmergencyActive) {
+        const isRed = (Date.now() % 400) < 200;
+        this.vmsSignMesh.material.emissive.setHex(isRed ? 0xef4444 : 0x06b6d4);
+        this.vmsSignMesh.material.emissiveIntensity = 1.6;
+      } else {
+        this.vmsSignMesh.material.emissive.setHex(0x0284c7);
+        this.vmsSignMesh.material.emissiveIntensity = 0.4;
+      }
+    }
+  }
+
+  setCameraPreset(presetName) {
+    const p = this.cameraPresets[presetName] || this.cameraPresets.isometric;
+    if (this.camera) {
+      this.camera.position.set(p.pos[0], p.pos[1], p.pos[2]);
+      this.camera.lookAt(p.target[0], p.target[1], p.target[2]);
+      if (this.controls) {
+        this.controls.target.set(p.target[0], p.target[1], p.target[2]);
+        this.controls.update();
+      }
+    }
+  }
+
+  onResize() {
+    if (!this.container || !this.renderer || !this.camera) return;
+    const w = this.container.clientWidth;
+    const h = this.container.clientHeight;
+    if (w === 0 || h === 0) return;
+
+    this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(w, h);
+  }
+
+  start() {
+    this.isRunning = true;
+    this.init();
+    this.onResize();
+
+    const renderLoop = () => {
+      if (!this.isRunning) return;
+      if (this.controls) this.controls.update();
+      this.syncWith2DSim();
+      this.renderer.render(this.scene, this.camera);
+      requestAnimationFrame(renderLoop);
+    };
+    renderLoop();
+  }
+
+  stop() {
+    this.isRunning = false;
+  }
+}
+
+window.TrafficSim3D = TrafficSim3D;
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” Geospatial Map & Multi-Map Manager
+ * Features:
+ * - Real interactive maps powered by Leaflet & Google Maps Tile Services
+ * - Google Road, Google Satellite, Google Hybrid, and Cyber Dark layers
+ * - Preloaded global junctions + dynamic "Add Another Map" persistence
+ * - Real-time violation heatmap pins and emergency GPS corridor routing
+ */
+
+class KynexMapModule {
+  constructor(mapContainerId) {
+    this.containerId = mapContainerId;
+    this.map = null;
+    this.activeLayer = null;
+    this.tileLayers = {};
+    this.markersGroup = null;
+    this.violationsGroup = null;
+    this.routeGroup = null;
+    this.activeJunction = null;
+    this.allJunctions = [];
+  }
+
+  async init() {
+    if (this.map) return;
+    if (!window.L) {
+      console.error('Leaflet library not loaded');
+      return;
+    }
+
+    // Define Tile Providers
+    this.tileLayers = {
+      google_road: L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: 'Map data &copy; Google Maps'
+      }),
+      google_satellite: L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: 'Imagery &copy; Google Maps Satellite'
+      }),
+      google_hybrid: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: 'Map & Imagery &copy; Google Maps'
+      }),
+      carto_dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        subdomains: 'abcd',
+        attribution: '&copy; CartoDB Dark Matter'
+      })
+    };
+
+    // Load saved maps from database
+    this.allJunctions = await window.KynexDB.getMaps();
+    this.activeJunction = this.allJunctions[0] || {
+      id: 'junc_default',
+      name: 'Central 4-Way Axis',
+      lat: 40.758896,
+      lng: -73.985130,
+      zoom: 17
+    };
+
+    // Initialize Leaflet Map centered on default junction
+    this.map = L.map(this.containerId, {
+      center: [this.activeJunction.lat, this.activeJunction.lng],
+      zoom: this.activeJunction.zoom || 17,
+      layers: [this.tileLayers.carto_dark], // Default to Cyber Dark
+      zoomControl: true
+    });
+
+    this.activeLayer = 'carto_dark';
+
+    // Layer groups for clean management
+    this.markersGroup = L.layerGroup().addTo(this.map);
+    this.violationsGroup = L.layerGroup().addTo(this.map);
+    this.routeGroup = L.layerGroup().addTo(this.map);
+
+    // Render junction markers and UI
+    this.refreshJunctionMarkers();
+    this.populateJunctionSelector();
+
+    // Setup map click listener to assist coordinate picking for "Add Another Map"
+    this.map.on('click', (e) => {
+      this.handleMapClick(e);
+    });
+
+    // Invalidate size on tab switch
+    setTimeout(() => {
+      this.map.invalidateSize();
+    }, 400);
+  }
+
+  // Switch Base Layer (Google Road / Google Sat / Google Hybrid / Cyber Dark)
+  setLayer(layerKey) {
+    if (!this.tileLayers[layerKey] || this.activeLayer === layerKey) return;
+
+    this.map.removeLayer(this.tileLayers[this.activeLayer]);
+    this.tileLayers[layerKey].addTo(this.map);
+    this.activeLayer = layerKey;
+
+    // Update active button state
+    document.querySelectorAll('.layer-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.layer === layerKey);
+    });
+  }
+
+  // Populate Dropdown with available maps
+  populateJunctionSelector() {
+    const select = document.getElementById('mapSelect');
+    if (!select) return;
+
+    select.innerHTML = '';
+    this.allJunctions.forEach(j => {
+      const opt = document.createElement('option');
+      opt.value = j.id;
+      opt.textContent = `${j.name} (${j.city || 'Custom'})`;
+      if (j.id === this.activeJunction.id) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+
+    select.onchange = (e) => {
+      this.switchJunction(e.target.value);
+    };
+  }
+
+  // Switch active junction with smooth flyTo animation
+  switchJunction(junctionId) {
+    const j = this.allJunctions.find(item => item.id === junctionId);
+    if (!j) return;
+
+    this.activeJunction = j;
+    this.map.flyTo([j.lat, j.lng], j.zoom || 17, {
+      duration: 1.5,
+      easeLinearity: 0.25
+    });
+
+    // Update top header junction badge
+    const badge = document.getElementById('activeJunctionTitle');
+    if (badge) {
+      badge.textContent = j.name;
+    }
+
+    window.KynexAudio.playClick();
+    this.refreshJunctionMarkers();
+  }
+
+  // Refresh Markers on Map
+  refreshJunctionMarkers() {
+    this.markersGroup.clearLayers();
+
+    this.allJunctions.forEach(j => {
+      const isCurrent = j.id === this.activeJunction.id;
+
+      // Custom pulsing HTML marker
+      const markerHtml = `
+        <div class="custom-junction-marker" style="${isCurrent ? 'background: rgba(6, 182, 212, 0.95); border-color: #fff;' : 'background: rgba(30, 41, 59, 0.85);'}">
+          ${isCurrent ? 'ðŸš¦' : 'ðŸ“'}
+        </div>
+      `;
+
+      const customIcon = L.divIcon({
+        className: 'custom-map-icon',
+        html: markerHtml,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
+      const marker = L.marker([j.lat, j.lng], { icon: customIcon });
+
+      const popupHtml = `
+        <div style="font-family: sans-serif; min-width: 200px; color: #0f172a; padding: 4px;">
+          <h4 style="font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #1d4ed8;">${j.name}</h4>
+          <p style="font-size: 11px; margin-bottom: 6px; color: #64748b;">${j.city}, ${j.country || ''}</p>
+          <div style="font-size: 10px; background: #f1f5f9; padding: 6px; border-radius: 4px; margin-bottom: 8px;">
+            <div><strong>Signals:</strong> ${j.signalsCount || 4} Approaches</div>
+            <div><strong>Cameras:</strong> ${j.camerasCount || 6} AI Nodes</div>
+            <div><strong>Speed Limit:</strong> ${j.speedLimit || '50 km/h'}</div>
+          </div>
+          ${!isCurrent ? `<button onclick="window.KynexMap.switchJunction('${j.id}')" style="width: 100%; padding: 6px; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">SELECT INTERSECTION</button>` : `<span style="font-size: 10px; color: #10b981; font-weight: bold;">â— Active Intersection</span>`}
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      this.markersGroup.addLayer(marker);
+    });
+  }
+
+  // Pin a live violation on the map with pulse animation
+  addViolationHotspot(violation) {
+    if (!this.map || !this.activeJunction) return;
+
+    // Small random offset near current junction to simulate exact street coordinate
+    const latOffset = (Math.random() - 0.5) * 0.002;
+    const lngOffset = (Math.random() - 0.5) * 0.002;
+    const vLat = this.activeJunction.lat + latOffset;
+    const vLng = this.activeJunction.lng + lngOffset;
+
+    const iconHtml = `
+      <div class="custom-violation-marker">
+        ${violation.icon || 'âš ï¸'}
+      </div>
+    `;
+
+    const icon = L.divIcon({
+      className: 'custom-violation-div',
+      html: iconHtml,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    const marker = L.marker([vLat, vLng], { icon: icon });
+
+    const popupContent = `
+      <div style="font-family: sans-serif; color: #0f172a; min-width: 180px;">
+        <div style="font-size: 12px; font-weight: bold; color: #ef4444; margin-bottom: 4px;">ðŸš¨ ${violation.ruleName}</div>
+        <div style="font-size: 11px; font-family: monospace; font-weight: bold;">Plate: ${violation.plate}</div>
+        <div style="font-size: 10px; color: #64748b; margin-bottom: 6px;">${violation.displayTime} â€¢ Speed: ${violation.speed}</div>
+        <div style="font-size: 12px; font-weight: bold; color: #16a34a;">Fine: â‚¹${violation.fine}</div>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent);
+    this.violationsGroup.addLayer(marker);
+
+    // Limit active violation markers to 25 to prevent clutter
+    const layers = this.violationsGroup.getLayers();
+    if (layers.length > 25) {
+      this.violationsGroup.removeLayer(layers[0]);
+    }
+  }
+
+  // Draw Emergency Corridor Route on Map
+  showEmergencyRoute() {
+    this.routeGroup.clearLayers();
+    if (!this.activeJunction) return;
+
+    const jLat = this.activeJunction.lat;
+    const jLng = this.activeJunction.lng;
+
+    // Draw route from approaching hospital corridor to intersection
+    const routeCoords = [
+      [jLat + 0.005, jLng - 0.002],
+      [jLat + 0.003, jLng - 0.001],
+      [jLat, jLng],
+      [jLat - 0.004, jLng + 0.002]
+    ];
+
+    const polyline = L.polyline(routeCoords, {
+      color: '#ef4444',
+      weight: 6,
+      opacity: 0.85,
+      dashArray: '8, 8'
+    });
+
+    this.routeGroup.addLayer(polyline);
+
+    // Clear after emergency ends
+    setTimeout(() => {
+      this.routeGroup.clearLayers();
+    }, 12000);
+  }
+
+  // Handle map click to pick coordinates for Add Map modal
+  handleMapClick(e) {
+    const latInput = document.getElementById('newMapLat');
+    const lngInput = document.getElementById('newMapLng');
+    if (latInput && lngInput) {
+      latInput.value = e.latlng.lat.toFixed(6);
+      lngInput.value = e.latlng.lng.toFixed(6);
+    }
+  }
+
+  // Add a newly registered map
+  async registerNewMap(mapData) {
+    const saved = await window.KynexDB.saveMap(mapData);
+    this.allJunctions = await window.KynexDB.getMaps();
+    this.populateJunctionSelector();
+    this.refreshJunctionMarkers();
+    this.switchJunction(saved.id);
+    window.KynexAudio.playSuccess();
+    return saved;
+  }
+}
+
+window.KynexMapModule = KynexMapModule;
+
+</script>
+  <script>
+/**
+ * KYNEX 2.0 â€” Central Application Coordinator
+ * Manages State, UI Interactions, Sub-systems, Ledger, and Telemetry
+ */
+
+class KynexApp {
+  constructor() {
+    this.operator = null;
+    this.sim2d = null;
+    this.sim3d = null;
+    this.mapModule = null;
+    
+    this.activeTab = 'command';
+    this.viewMode = '2d'; // '2d' or '3d'
+    this.autoViolationInterval = null;
+    this.telemetryInterval = null;
+
+    this.init();
+  }
+
+  async init() {
+    // 1. Initialize Persistent Database
+    await window.KynexDB.init();
+
+    // 2. Setup Audio State
+    this.updateSoundIcon();
+
+    // 3. Setup Clock
+    this.startClock();
+
+    // 4. Attach Event Handlers
+    this.attachEventListeners();
+
+    // 5. Populate Rules Tab
+    this.populateRulesList();
+  }
+
+  // --- AUTHENTICATION ---
+  async login() {
+    const idInput = document.getElementById('userId');
+    const passInput = document.getElementById('userPass');
+    const id = idInput.value.trim() || 'OPERATOR001';
+    const pass = passInput.value.trim() || 'admin123';
+
+    if (pass !== 'admin123' && pass.length < 3) {
+      alert('Authentication Failed: Please enter valid credentials (admin123).');
+      return;
+    }
+
+    this.operator = id;
+    window.KynexAudio.playSuccess();
+
+    // Hide Login Screen
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('operatorDisplay').textContent = this.operator;
+
+    // Log Audit
+    await window.KynexDB.logAudit(this.operator, 'LOGIN', `Operator authenticated successfully from Terminal-01.`);
+
+    // Initialize Simulation Engines
+    this.initSimulations();
+
+    // Initialize Geospatial Map
+    window.KynexMap = new window.KynexMapModule('leafletMap');
+    await window.KynexMap.init();
+
+    // Start Telemetry Tickers
+    this.startTelemetryLoops();
+
+    // Refresh Ledger & Stats
+    await this.refreshRevenueStats();
+    await this.refreshLedgerTable();
+  }
+
+  logout() {
+    window.KynexAudio.playClick();
+    if (confirm('Are you sure you want to log out of KYNEX Command Deck?')) {
+      if (this.sim2d) this.sim2d.stop();
+      if (this.sim3d) this.sim3d.stop();
+      if (this.autoViolationInterval) clearInterval(this.autoViolationInterval);
+      if (this.telemetryInterval) clearInterval(this.telemetryInterval);
+
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('userPass').value = '';
+    }
+  }
+
+  // --- INITIALIZE SIMULATIONS ---
+  initSimulations() {
+    // 1. Start 2D Tactical Engine
+    this.sim2d = new window.TrafficSim2D('canvas2D');
+    this.sim2d.start();
+
+    // 2. Start 3D Engine
+    this.sim3d = new window.TrafficSim3D('canvas3D-container', this.sim2d);
+    // Don't start 3D loop until switched to save GPU cycles, or start on demand
+  }
+
+  // --- VIEW MODE SWITCHER (2D â†” 3D) ---
+  switchViewMode(mode) {
+    if (this.viewMode === mode) return;
+    this.viewMode = mode;
+    window.KynexAudio.playClick();
+
+    const canvas2D = document.getElementById('canvas2D');
+    const container3D = document.getElementById('canvas3D-container');
+    const cameraPresets = document.getElementById('cameraPresetsGroup');
+
+    document.querySelectorAll('.view-mode-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+
+    if (mode === '3d') {
+      canvas2D.style.display = 'none';
+      container3D.style.display = 'block';
+      cameraPresets.style.display = 'flex';
+      
+      if (!this.sim3d.isRunning) {
+        this.sim3d.start();
+      }
+      this.sim3d.onResize();
+    } else {
+      container3D.style.display = 'none';
+      canvas2D.style.display = 'block';
+      cameraPresets.style.display = 'none';
+      this.sim2d.resize();
+    }
+  }
+
+  // --- NAVIGATION TABS ---
+  switchTab(tabId) {
+    this.activeTab = tabId;
+    window.KynexAudio.playClick();
+
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // Tab content sections
+    document.querySelectorAll('.tab-content').forEach(sec => {
+      sec.classList.remove('active');
+    });
+
+    const activeSec = document.getElementById(`tab-${tabId}`);
+    if (activeSec) {
+      activeSec.classList.add('active');
+    }
+
+    // Tab specific refresh actions
+    if (tabId === 'map' && window.KynexMap && window.KynexMap.map) {
+      setTimeout(() => {
+        window.KynexMap.map.invalidateSize();
+      }, 200);
+    } else if (tabId === 'database') {
+      this.refreshLedgerTable();
+    } else if (tabId === 'command') {
+      if (this.viewMode === '2d' && this.sim2d) {
+        this.sim2d.resize();
+      } else if (this.viewMode === '3d' && this.sim3d) {
+        this.sim3d.onResize();
+      }
+    }
+  }
+
+  // --- TELEMETRY & METRIC TICKERS ---
+  startTelemetryLoops() {
+    // 1. Periodic Telemetry Update (every 250ms)
+    this.telemetryInterval = setInterval(() => {
+      if (!this.sim2d) return;
+
+      // HUD indicators
+      const remaining = this.sim2d.getSecondsRemaining();
+      document.getElementById('hudPhaseSec').textContent = `${remaining}s`;
+
+      const nsQueue = this.sim2d.vehicles.north.filter(v => v.speed < 2).length + this.sim2d.vehicles.south.filter(v => v.speed < 2).length;
+      const ewQueue = this.sim2d.vehicles.east.filter(v => v.speed < 2).length + this.sim2d.vehicles.west.filter(v => v.speed < 2).length;
+      document.getElementById('hudQueueNS').textContent = nsQueue;
+      document.getElementById('hudQueueEW').textContent = ewQueue;
+
+      // Update current phase light indicator dots in left panel
+      const sigs = this.sim2d.signals;
+      ['north', 'south', 'east', 'west'].forEach(dir => {
+        const dot = document.getElementById(`sigDot_${dir}`);
+        if (dot) {
+          dot.className = `signal-light-dot ${sigs[dir]}`;
+        }
+      });
+    }, 250);
+
+    // 2. Automated Stochastic Real-World Violations (every 12-18 seconds)
+    this.autoViolationInterval = setInterval(() => {
+      if (!this.operator) return;
+      if (Math.random() < 0.65) {
+        const ruleKeys = Object.keys(window.TRAFFIC_RULES);
+        const randomKey = ruleKeys[Math.floor(Math.random() * ruleKeys.length)];
+        this.triggerViolation(randomKey, false);
+      }
+    }, 14000);
+  }
+
+  // --- VIOLATION TRIGGER & LEDGER CREATION ---
+  async triggerViolation(ruleKey, isManual = true) {
+    const junction = window.KynexMap ? window.KynexMap.activeJunction : null;
+    const violation = window.RulesManager.createViolation(ruleKey, null, junction);
+
+    // Save to Persistent Database
+    await window.KynexDB.saveViolation(violation);
+
+    // Play Alert Sound
+    window.KynexAudio.playAlert();
+
+    // Add Live Hotspot to Map
+    if (window.KynexMap) {
+      window.KynexMap.addViolationHotspot(violation);
+    }
+
+    // Refresh Right Panel Live Feed & Revenue Stats
+    this.prependLiveViolationFeed(violation);
+    await this.refreshRevenueStats();
+
+    // Log Audit if triggered manually by operator
+    if (isManual) {
+      await window.KynexDB.logAudit(this.operator, 'TEST_VIOLATION', `Manual test violation injected: ${violation.ruleName} for ${violation.plate}`);
+    }
+  }
+
+  // Prepend to Live Violations Scroll List in right panel
+  prependLiveViolationFeed(v) {
+    const list = document.getElementById('liveViolationsList');
+    if (!list) return;
+
+    // Remove placeholder
+    const emptyRow = list.querySelector('.empty-feed');
+    if (emptyRow) emptyRow.remove();
+
+    const row = document.createElement('div');
+    row.className = 'violation-row-card';
+    row.onclick = () => this.showEvidenceModal(v);
+
+    row.innerHTML = `
+      <div class="violation-row-icon">${v.icon}</div>
+      <div class="violation-row-details">
+        <div class="violation-row-plate">${v.plate} <span style="color: #64748b; font-size: 9px;">â€¢ ${v.displayTime}</span></div>
+        <div class="violation-row-name">${v.ruleName}</div>
+      </div>
+      <div class="violation-row-fine">â‚¹${v.fine.toLocaleString()}</div>
+    `;
+
+    list.insertBefore(row, list.firstChild);
+
+    // Keep max 20 rows in live feed view
+    if (list.children.length > 20) {
+      list.removeChild(list.lastChild);
+    }
+  }
+
+  // Show Evidence Snapshot Modal Dialog with ANPR Canvas
+  showEvidenceModal(v) {
+    window.KynexAudio.playClick();
+    const modal = document.getElementById('evidenceModal');
+    const canvas = document.getElementById('evidenceCanvas');
+
+    document.getElementById('modalChallanNo').textContent = v.challanNo;
+    document.getElementById('modalPlate').textContent = v.plate;
+    document.getElementById('modalRule').textContent = v.ruleName;
+    document.getElementById('modalFine').textContent = `â‚¹${v.fine.toLocaleString()}`;
+    document.getElementById('modalSpeed').textContent = v.speed;
+    document.getElementById('modalStatus').textContent = v.status;
+    document.getElementById('modalStatus').className = `badge ${v.status === 'Paid' ? 'badge-green' : 'badge-red'}`;
+
+    // Render Canvas CCTV Snapshot
+    window.RulesManager.drawEvidenceSnapshot(canvas, v);
+
+    // Action button to mark as paid / unpaid
+    const actionBtn = document.getElementById('modalPayBtn');
+    actionBtn.textContent = v.status === 'Paid' ? 'MARK AS UNPAID' : 'MARK AS PAID';
+    actionBtn.onclick = async () => {
+      const newStatus = v.status === 'Paid' ? 'Pending' : 'Paid';
+      await window.KynexDB.updateViolationStatus(v.challanNo, newStatus);
+      v.status = newStatus;
+      window.KynexAudio.playSuccess();
+      this.closeModal('evidenceModal');
+      await this.refreshRevenueStats();
+      await this.refreshLedgerTable();
+    };
+
+    modal.classList.add('open');
+  }
+
+  // --- REVENUE & STATS REFRESH ---
+  async refreshRevenueStats() {
+    const stats = await window.KynexDB.getRevenueStats();
+
+    const elToday = document.getElementById('statFineToday');
+    const elMonth = document.getElementById('statFineMonth');
+    const elPending = document.getElementById('statPendingCount');
+    const elPaid = document.getElementById('statPaidCount');
+
+    if (elToday) elToday.textContent = `â‚¹${stats.todayTotal.toLocaleString()}`;
+    if (elMonth) elMonth.textContent = `â‚¹${stats.monthTotal.toLocaleString()}`;
+    if (elPending) elPending.textContent = stats.pendingCount;
+    if (elPaid) elPaid.textContent = stats.paidCount;
+  }
+
+  // --- CHALLAN LEDGER TABLE ---
+  async refreshLedgerTable() {
+    const tableBody = document.getElementById('ledgerTableBody');
+    if (!tableBody) return;
+
+    const searchTerm = (document.getElementById('ledgerSearchInput')?.value || '').toLowerCase().trim();
+    const statusFilter = document.getElementById('ledgerStatusFilter')?.value || 'ALL';
+
+    let records = await window.KynexDB.getViolations(200);
+
+    // Filter
+    if (searchTerm) {
+      records = records.filter(r => 
+        r.plate.toLowerCase().includes(searchTerm) ||
+        r.challanNo.toLowerCase().includes(searchTerm) ||
+        r.ruleName.toLowerCase().includes(searchTerm)
+      );
+    }
+    if (statusFilter !== 'ALL') {
+      records = records.filter(r => r.status === statusFilter);
+    }
+
+    tableBody.innerHTML = '';
+    if (records.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #64748b; padding: 24px;">No matching E-Challan records found.</td></tr>`;
+      return;
+    }
+
+    records.forEach(v => {
+      const tr = document.createElement('tr');
+      const isPaid = v.status === 'Paid';
+
+      tr.innerHTML = `
+        <td class="mono" style="color: #93c5fd;">${v.challanNo}</td>
+        <td class="mono" style="font-weight: 700; color: #fff;">${v.plate}</td>
+        <td>${v.icon} ${v.ruleName}</td>
+        <td class="mono" style="color: var(--accent-rose); font-weight: 700;">â‚¹${v.fine.toLocaleString()}</td>
+        <td class="mono">${v.speed}</td>
+        <td>${v.displayTime} <span style="font-size: 10px; color: #64748b;">${v.date}</span></td>
+        <td><span class="badge ${isPaid ? 'badge-green' : 'badge-red'}">${v.status}</span></td>
+        <td>
+          <button class="btn-secondary" style="padding: 4px 8px; font-size: 10px;" onclick="window.app.showEvidenceModal(${JSON.stringify(v).replace(/"/g, '&quot;')})">VIEW PROOF</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  // --- EMERGENCY AMBULANCE CASCADE ---
+  triggerEmergencyAmbulance() {
+    if (!this.sim2d) return;
+
+    const btn = document.getElementById('btnEmergency');
+    const msg = document.getElementById('emergencyStatusMsg');
+    const cascadeBox = document.getElementById('cascadeStepsBox');
+
+    if (this.sim2d.isEmergencyActive) {
+      alert('Emergency Green Corridor is already active and clearing traffic.');
+      return;
+    }
+
+    // Start Procedural Audio Siren & PA Voice Horn
+    window.KynexAudio.startSiren();
+    window.KynexAudio.speakPAAnnouncement("Attention drivers on North Axis: Emergency ambulance approaching. Yield to the curbs and clear the center lane.");
+
+    // Trigger Corridor in 2D Sim (North approach)
+    this.sim2d.triggerEmergencyCorridor('north');
+
+    // Show on Map Route
+    if (window.KynexMap) {
+      window.KynexMap.showEmergencyRoute();
+    }
+
+    // Update UI Status
+    msg.textContent = 'ðŸš¨ PRIORITY 1: DISPATCHING AMBULANCE CONVOY (PA HORN & RESCUE LANE ACTIVE)';
+    msg.classList.add('active');
+    cascadeBox.style.display = 'flex';
+
+    // Cascade Progress Stepper
+    const stepItems = cascadeBox.querySelectorAll('.cascade-step-item');
+    let step = 0;
+
+    const stepInterval = setInterval(() => {
+      step++;
+      stepItems.forEach((item, idx) => {
+        item.classList.toggle('active', idx === step - 1);
+      });
+
+      if (step >= 4) {
+        clearInterval(stepInterval);
+        setTimeout(() => {
+          // Reset emergency state after ambulance clears intersection
+          window.KynexAudio.stopSiren();
+          msg.textContent = 'Corridor Clear â€¢ Standard Signal Cycle Resumed';
+          msg.classList.remove('active');
+          cascadeBox.style.display = 'none';
+        }, 5000);
+      }
+    }, 1800);
+
+    // Log Audit
+    window.KynexDB.logAudit(this.operator, 'EMERGENCY_DISPATCH', 'Ambulance green corridor route pre-emption initiated on North Axis.');
+  }
+
+  // --- MODAL CONTROLS ---
+  openModal(modalId) {
+    window.KynexAudio.playClick();
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('open');
+  }
+
+  closeModal(modalId) {
+    window.KynexAudio.playClick();
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove('open');
+  }
+
+  // --- ADD ANOTHER MAP HANDLER ---
+  async handleAddNewMapSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('newMapName').value.trim();
+    const city = document.getElementById('newMapCity').value.trim();
+    const country = document.getElementById('newMapCountry').value.trim() || 'Global';
+    const lat = parseFloat(document.getElementById('newMapLat').value);
+    const lng = parseFloat(document.getElementById('newMapLng').value);
+    const speedLimit = document.getElementById('newMapSpeed').value.trim() || '50 km/h';
+    const notes = document.getElementById('newMapNotes').value.trim() || 'Custom registered intersection.';
+
+    if (!name || isNaN(lat) || isNaN(lng)) {
+      alert('Please fill out Junction Name, Latitude, and Longitude.');
+      return;
+    }
+
+    const newMapData = {
+      id: 'map_' + Date.now(),
+      name,
+      city,
+      country,
+      lat,
+      lng,
+      zoom: 17,
+      signalsCount: 4,
+      camerasCount: 6,
+      speedLimit,
+      notes,
+      isDefault: false
+    };
+
+    await window.KynexMap.registerNewMap(newMapData);
+    this.closeModal('addMapModal');
+
+    // Switch to Map tab to show the new location immediately
+    this.switchTab('map');
+    alert(`Success! "${name}" has been saved to the persistent database and activated.`);
+  }
+
+  // --- DATABASE EXPORT & IMPORT ---
+  async exportJSON() {
+    window.KynexAudio.playSuccess();
+    await window.KynexDB.exportBackupJSON();
+  }
+
+  async exportCSV() {
+    window.KynexAudio.playSuccess();
+    await window.KynexDB.exportChallansCSV();
+  }
+
+  async handleImportFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const res = await window.KynexDB.importBackupJSON(e.target.result);
+      if (res.success) {
+        window.KynexAudio.playSuccess();
+        alert(`Database Restore Complete! Imported ${res.count} records.`);
+        this.closeModal('backupModal');
+        await this.refreshRevenueStats();
+        await this.refreshLedgerTable();
+        if (window.KynexMap) {
+          window.KynexMap.allJunctions = await window.KynexDB.getMaps();
+          window.KynexMap.populateJunctionSelector();
+        }
+      } else {
+        alert('Restore Failed: ' + res.error);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // --- SOUND TOGGLE ---
+  toggleSound() {
+    const isMuted = window.KynexAudio.toggleMute();
+    this.updateSoundIcon();
+  }
+
+  updateSoundIcon() {
+    const btn = document.getElementById('btnSoundToggle');
+    if (!btn) return;
+    btn.innerHTML = window.KynexAudio.isMuted 
+      ? `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`
+      : `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+  }
+
+  // --- CLOCK ---
+  startClock() {
+    const update = () => {
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) {
+        const now = new Date();
+        clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' LOCAL';
+      }
+    };
+    update();
+    setInterval(update, 1000);
+  }
+
+  // --- POPULATE RULES LIST ---
+  populateRulesList() {
+    // 1. Mini list in left panel
+    const miniList = document.getElementById('rulesMiniList');
+    if (miniList) {
+      miniList.innerHTML = '';
+      Object.values(window.TRAFFIC_RULES).slice(0, 5).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'rule-pill-item';
+        div.innerHTML = `
+          <span class="rule-pill-name">${r.icon} ${r.name.split('(')[0]}</span>
+          <span class="rule-pill-fine">â‚¹${r.fine}</span>
+        `;
+        miniList.appendChild(div);
+      });
+    }
+
+    // 2. Full cards grid in Rules Tab
+    const fullGrid = document.getElementById('rulesCardsGrid');
+    if (fullGrid) {
+      fullGrid.innerHTML = '';
+      Object.values(window.TRAFFIC_RULES).forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'rule-detail-card';
+        card.innerHTML = `
+          <div class="rule-detail-header">
+            <span class="rule-detail-icon">${r.icon}</span>
+            <span class="badge ${r.severity === 'Critical' ? 'badge-red' : (r.severity === 'High' ? 'badge-amber' : 'badge-blue')}">${r.severity}</span>
+          </div>
+          <div class="rule-detail-title">${r.name}</div>
+          <div class="rule-detail-section">${r.section}</div>
+          <div class="rule-detail-desc">${r.desc}</div>
+          <div class="rule-detail-fine">Fine: â‚¹${r.fine.toLocaleString()}</div>
+          <button class="btn-secondary" style="margin-top: 8px;" onclick="window.app.triggerViolation('${r.key}')">Simulate Violation</button>
+        `;
+        fullGrid.appendChild(card);
+      });
+    }
+  }
+
+  // --- ATTACH EVENT LISTENERS ---
+  attachEventListeners() {
+    // Mode switcher in Left Panel
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (this.sim2d) this.sim2d.setMode(btn.dataset.mode);
+        window.KynexAudio.playClick();
+      };
+    });
+
+    // Speed multiplier selector in HUD
+    document.querySelectorAll('.speed-pill').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.speed-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const spd = Number(btn.dataset.speed) || 1;
+        if (this.sim2d) this.sim2d.setSpeed(spd);
+        window.KynexAudio.playClick();
+      };
+    });
+
+    // 3D Camera Presets
+    document.querySelectorAll('.camera-preset-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.camera-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (this.sim3d) this.sim3d.setCameraPreset(btn.dataset.preset);
+        window.KynexAudio.playClick();
+      };
+    });
+
+    // Timing Sliders
+    ['north', 'south', 'east', 'west'].forEach(dir => {
+      const slider = document.getElementById(`slider_${dir}`);
+      const valLabel = document.getElementById(`val_${dir}`);
+      if (slider && valLabel) {
+        slider.oninput = (e) => {
+          valLabel.textContent = e.target.value;
+          if (this.sim2d) this.sim2d.updateTiming(dir, e.target.value);
+        };
+      }
+    });
+
+    // Add Map Form submit
+    const addMapForm = document.getElementById('addMapForm');
+    if (addMapForm) {
+      addMapForm.onsubmit = (e) => this.handleAddNewMapSubmit(e);
+    }
+
+    // Ledger Search & Filter
+    const searchInput = document.getElementById('ledgerSearchInput');
+    if (searchInput) {
+      searchInput.oninput = () => this.refreshLedgerTable();
+    }
+    const statusFilter = document.getElementById('ledgerStatusFilter');
+    if (statusFilter) {
+      statusFilter.onchange = () => this.refreshLedgerTable();
+    }
+
+    // Close modals when clicking backdrop outside dialog
+    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('open');
+          window.KynexAudio.playClick();
+        }
+      };
+    });
+  }
+}
+
+// Global entrypoint
+window.addEventListener('DOMContentLoaded', () => {
+  window.app = new KynexApp();
+});
+
+</script>
+
+</body>
+</html>
+
